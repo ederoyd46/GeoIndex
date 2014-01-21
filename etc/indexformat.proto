@@ -1,0 +1,11 @@
+option java_package = "PB.Index";
+//option java_outer_classname = "FileFormat";
+
+message Entry {
+	required string term = 1;
+	required string latitude = 2;
+	required string longitude = 3;
+//	required sint64 latitude = 2;
+//	required sint64 longitude = 3;
+	required string src = 4;
+}
