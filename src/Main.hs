@@ -1,11 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Text.CSV
+import Text.CSV(parseCSVFromFile, Field, CSV)
 import Data.List(map)
 import Control.Monad(mapM_)
 import qualified PB.Index.Entry as Entry
-import Text.ProtocolBuffers
-import Text.ProtocolBuffers.Header (defaultValue, uFromString)
+import Text.ProtocolBuffers.Header (uFromString)
 import Text.ProtocolBuffers.WireMessage (messageGet, messagePut)
 import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
@@ -18,6 +17,7 @@ main = do
 		Right d -> decodeFile d
 		Left err -> putStrLn "File has no data"
 
+decodeFile :: CSV -> IO ()
 decodeFile csv = do
 	putStrLn $ "File has " ++ (show $ length csv) ++ " entries"
 	let rows = filter (isJust) $ map (decodeRow) csv
