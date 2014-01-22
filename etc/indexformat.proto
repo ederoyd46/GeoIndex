@@ -1,6 +1,11 @@
 option java_package = "PB.Index";
 //option java_outer_classname = "FileFormat";
 
+message Header {
+	repeated string term = 1;
+	repeated sint64 size = 2;
+}
+
 message Entry {
 	required string term = 1;
 	required string latitude = 2;
