@@ -23,7 +23,8 @@ Executable GeoIndex
     protocol-buffers-descriptor >= 2.0.14,
     utf8-string >= 0.3.7,
     bytestring >= 0.10.0.2,
-    zlib >= 0.5.4.1
+    zlib >= 0.5.4.1,
+    containers >= 0.5.4.0
 
 
   -- ghc-options: -threaded -O2 -auto-all -rtsopts -with-rtsopts=-H4096m

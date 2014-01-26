@@ -18,6 +18,9 @@ sandbox-init:
 	cabal sandbox init --sandbox $(CABAL_SANDBOX)
 	cabal install --only-dependencies --force-reinstalls
 
+install-deps:
+	cabal install --only-dependencies --force-reinstalls
+
 docs:
 	cabal haddock --executables --hyperlink-source
 
