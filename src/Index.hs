@@ -15,13 +15,10 @@ import Text.ProtocolBuffers.WireMessage (messagePut)
 import Data.Binary (encode)
 import Data.Binary.Get (Get, getWord64be)
 import Data.Foldable (toList)
-
 import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile)
-
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Maybe(isJust, fromJust)
 import Data.Int
-
 
 indexFile :: String -> IO ()
 indexFile f = do
@@ -29,7 +26,6 @@ indexFile f = do
 	case csv of
 		Right d -> decodeFile d
 		Left err -> putStrLn "File has no data"
-
 
 decodeFile :: CSV -> IO ()
 decodeFile csv = do

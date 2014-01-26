@@ -12,7 +12,6 @@ import Text.ProtocolBuffers.WireMessage (messageGet)
 import Data.Binary.Get (Get, getWord64be, getLazyByteString, runGet, bytesRead, skip)
 import Data.Foldable (toList)
 import qualified Data.ByteString.Lazy as ByteString (readFile, length)
-
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Int
 
