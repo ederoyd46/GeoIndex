@@ -11,7 +11,8 @@ import Text.ProtocolBuffers (getVal)
 import Text.ProtocolBuffers.WireMessage (messageGet)
 import Data.Binary.Get (Get, getWord64be, getByteString, getLazyByteString, runGet, bytesRead, skip)
 import Data.Foldable (toList)
-import qualified Data.ByteString.Lazy as ByteString (readFile, length)
+import qualified Data.ByteString.Lazy as ByteString (readFile, length, splitAt)
+import qualified Data.ByteString as BS (readFile, length)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Sequence(elemIndexL,fromList)
 import Data.Int
@@ -35,13 +36,6 @@ search s = do
 			print entry
 		Nothing -> print "Does not exist"
 
-search' :: IO ()
-search' = do
-	handle <- ByteString.readFile "/tmp/test.pbf"
-	let entry = runGet (getEntry 128629787 72) handle
-	print entry
-
-
 getHeader :: Get (Header.Header, Int64)
 getHeader = do
     len <- getWord64be
@@ -56,4 +50,26 @@ getEntry offset entrySize = do
     entryBytes <- getLazyByteString (fromIntegral entrySize)
     let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
     return entry
+
+search' :: String -> IO ()
+search' s = do
+	handle <- ByteString.readFile "/tmp/test.pbf"
+	let (header, hoffset) = runGet getHeader handle
+	let terms = getVal header Header.term 
+	let sizes = deltaDecode $ toList $ getVal header Header.size 
+	case (elemIndexL (parseTerm s) terms) of
+		Just i -> do
+			let entrySize = sizes !! i
+			let offset = hoffset + (foldl1 (+) (take i sizes))
+			let (_, entryData) = ByteString.splitAt (fromIntegral offset) handle
+			let entry = runGet (getEntry' entrySize) entryData
+			print entry
+		Nothing -> print "Does not exist"
+
+getEntry' :: Int64 -> Get Entry.Entry
+getEntry' entrySize = do
+    entryBytes <- getLazyByteString (fromIntegral entrySize)
+    let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
+    return entry
+
 
