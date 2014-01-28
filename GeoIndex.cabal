@@ -12,7 +12,7 @@ category:            Commandline
 build-type:          Simple
 Cabal-version:       >=1.18
 
-Executable Geo-Index
+Executable geo-index
     hs-source-dirs: src
     main-is: Main-Index.hs
 
@@ -30,7 +30,7 @@ Executable Geo-Index
   ghc-options: -O2 -rtsopts
   default-language: Haskell2010
   
-Executable Geo-Search
+Executable geo-search
     hs-source-dirs: src
     main-is: Main-Search.hs
 

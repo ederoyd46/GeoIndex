@@ -16,7 +16,7 @@ import qualified Data.ByteString as ByteString'
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Sequence(elemIndexL,fromList)
 import Data.Int
-import Data.Char
+
 
 search :: String -> IO ()
 search s = do
@@ -48,12 +48,3 @@ getEntry offset entrySize = do
     let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
     return entry
 
-parseTerm :: String -> Utf8
-parseTerm = uFromString . parseTerm'
-
-parseTerm' :: String -> String
-parseTerm' = do
-	let filterAlphas = map (toUpper) . filter (\x -> (isAlpha x) || (isSpace x))
-	let removeSpaces = filter (isAlpha)
-	let filterWords = unwords . filter ("NEAR" /=) . filter ("IN" /=) . words
-	removeSpaces . filterWords . filterAlphas

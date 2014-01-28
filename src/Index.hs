@@ -33,7 +33,7 @@ decodeFile csv = do
 	let entries = filter (isJust) $ map (buildEntry) csv
 	let byteEntries = map (messagePut . fromJust) entries
 	let byteEntrySizes = deltaEncode $ map (ByteString.length) byteEntries
-	let terms = map (getSearchTerm . fromJust) entries
+	let terms = map (uParseTerm . getSearchTerm . fromJust) entries
 	let header = messagePut $ buildHeader terms byteEntrySizes
 	let headerSize = ByteString.length header :: Int64
 
