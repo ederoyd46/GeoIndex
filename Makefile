@@ -40,10 +40,14 @@ clean:
 	@rm -r $(BASE_DIR)/dist
 	
 kill:
-	killall GeoIndex
+	killall Geo-Index
+	killall Geo-Search
 
-ghci:
-	cabal repl
+ghci-index:
+	cabal repl src/Main-Index.hs
+
+ghci-search:
+	cabal repl src/Main-Search.hs
 
 generate-protocol-buffers:
 	cd $(BASE_DIR)/etc && hprotoc --include_imports --haskell_out=$(BASE_DIR)/src $(BASE_DIR)/etc/indexformat.proto
