@@ -11,8 +11,7 @@ import Text.ProtocolBuffers (getVal)
 import Text.ProtocolBuffers.WireMessage (messageGet)
 import Data.Binary.Get (Get, getWord64be, getByteString, getLazyByteString, runGet, bytesRead, skip)
 import Data.Foldable (toList)
-import qualified Data.ByteString.Lazy as ByteString (readFile, length, splitAt)
-import qualified Data.ByteString as BS (readFile, length)
+import qualified Data.ByteString.Lazy as ByteString (readFile, length, drop)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Sequence(elemIndexL,fromList)
 import Data.Int
@@ -61,7 +60,7 @@ search' s = do
 		Just i -> do
 			let entrySize = sizes !! i
 			let offset = hoffset + (foldl1 (+) (take i sizes))
-			let (_, entryData) = ByteString.splitAt (fromIntegral offset) handle
+			let entryData = ByteString.drop (fromIntegral offset) handle
 			let entry = runGet (getEntry' entrySize) entryData
 			print entry
 		Nothing -> print "Does not exist"
