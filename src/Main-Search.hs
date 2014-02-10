@@ -12,7 +12,7 @@ main = do
 	args <- getArgs
 	when (length args < 1) showUsage
 	let term = args !! 0
-	search' term
+	search term
 
 
 showUsage :: IO ()

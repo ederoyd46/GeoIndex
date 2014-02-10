@@ -15,23 +15,20 @@ import qualified Data.ByteString.Lazy as ByteString (readFile, length, drop)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Sequence(elemIndexL,fromList)
 import Data.Int
-
+import qualified Data.Map as M
 
 search :: String -> IO ()
 search s = do
 	handle <- ByteString.readFile "/tmp/test.pbf"
 	let (header, hoffset) = runGet getHeader handle
 	let terms = getVal header Header.term 
-	let sizes = deltaDecode $ toList $ getVal header Header.size 
-	print $ "Hoffset is: " ++ (show hoffset)
+	let sizes = deltaDecode $ toList $ getVal header Header.size
 	case (elemIndexL (parseTerm s) terms) of
 		Just i -> do
-			print $ "Index is: " ++ (show i)
-			let offset = hoffset + (foldl1 (+) (take i sizes))
-			print $ "Offset is: " ++ (show offset)
 			let entrySize = sizes !! i
-			print $ "EntrySize: " ++ (show entrySize)
-			let entry = runGet (getEntry offset entrySize) handle
+			let offset = hoffset + (foldl1 (+) (take i sizes))
+			let entryData = ByteString.drop (fromIntegral offset) handle
+			let entry = runGet (getEntry entrySize) entryData
 			print entry
 		Nothing -> print "Does not exist"
 
@@ -43,32 +40,37 @@ getHeader = do
     offset <- bytesRead
     return (header, offset)
 
-getEntry :: Int64 -> Int64 -> Get Entry.Entry
-getEntry offset entrySize = do
-    _ <- skip $ fromIntegral offset
+getEntry :: Int64 -> Get Entry.Entry
+getEntry entrySize = do
     entryBytes <- getLazyByteString (fromIntegral entrySize)
     let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
     return entry
 
-search' :: String -> IO ()
-search' s = do
-	handle <- ByteString.readFile "/tmp/test.pbf"
-	let (header, hoffset) = runGet getHeader handle
-	let terms = getVal header Header.term 
-	let sizes = deltaDecode $ toList $ getVal header Header.size 
-	case (elemIndexL (parseTerm s) terms) of
-		Just i -> do
-			let entrySize = sizes !! i
-			let offset = hoffset + (foldl1 (+) (take i sizes))
-			let entryData = ByteString.drop (fromIntegral offset) handle
-			let entry = runGet (getEntry' entrySize) entryData
-			print entry
-		Nothing -> print "Does not exist"
 
-getEntry' :: Int64 -> Get Entry.Entry
-getEntry' entrySize = do
-    entryBytes <- getLazyByteString (fromIntegral entrySize)
-    let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
-    return entry
+--search' :: String -> IO ()
+--search' s = do
+--	handle <- ByteString.readFile "/tmp/test.pbf"
+--	let (header, hoffset) = runGet getHeader handle
+--	let terms = toList $ getVal header Header.term 
+--	let sizes = deltaDecode $ toList $ getVal header Header.size
+--	let dataMap = M.fromList $ zip terms sizes
+--	case (M.lookup (parseTerm s) dataMap) of
+--		Just i -> do
+--			let entrySize = i
+--			--let offset = hoffset + (foldl1 (+) (take i sizes))
+--			--let entryData = ByteString.drop (fromIntegral offset) handle
+--			--let entry = runGet (getEntry entrySize) entryData
+--			print entrySize
+--		Nothing -> print "Does not exist"
+
+
+
+
+
+
+
+
+
+
 
 
