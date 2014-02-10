@@ -19,6 +19,9 @@ uParseTerm = uFromString . parseTerm' . uToString
 parseTerm :: String -> Utf8
 parseTerm = uFromString . parseTerm'
 
+sParseTerm :: Utf8 -> String
+sParseTerm = parseTerm' . uToString
+
 parseTerm' :: String -> String
 parseTerm' = do
 	let filterAlphas = map (toUpper) . filter (\x -> (isAlphaNum x) || (isSpace x))
