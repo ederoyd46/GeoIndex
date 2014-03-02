@@ -25,7 +25,8 @@ Executable geo-index
     bytestring >= 0.10.0.2,
     zlib >= 0.5.4.1,
     containers >= 0.5.4.0,
-    binary >= 0.7.1.0
+    binary >= 0.7.1.0,
+    aeson >= 0.7.0.1
 
   ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864
   default-language: Haskell2010
@@ -43,8 +44,8 @@ Executable geo-search
     bytestring >= 0.10.0.2,
     zlib >= 0.5.4.1,
     containers >= 0.5.4.0,
-    binary >= 0.7.1.0
-
+    binary >= 0.7.1.0,
+    aeson >= 0.7.0.1
 
   ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864
   default-language: Haskell2010
@@ -62,14 +63,11 @@ Executable geo-server
     bytestring >= 0.10.0.2,
     zlib >= 0.5.4.1,
     containers >= 0.5.4.0,
-    binary >= 0.7.1.0
+    binary >= 0.7.1.0,
+    aeson >= 0.7.0.1
 
   ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864
   default-language: Haskell2010
-
-
-
-
 
 
 

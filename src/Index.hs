@@ -6,7 +6,7 @@ import Common
 import Text.CSV(parseCSVFromFile, Field, CSV)
 import Data.List(map, elemIndex)
 import qualified Data.Map as M
-import Control.Monad(mapM_)
+import Control.Monad(mapM_, mzero)
 import qualified PB.Index.Entry as Entry
 import Text.ProtocolBuffers.Basic (ByteString, uFromString, uToString, Int64, Seq, Utf8)
 import Text.ProtocolBuffers (getVal)
@@ -16,6 +16,9 @@ import Data.Binary (encode)
 import Data.Binary.Get (Get, getWord64be)
 import Data.Foldable (toList)
 import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile)
+import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines, length)
+import qualified Data.Aeson as JSON
+import Control.Applicative
 
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Maybe(isJust, fromJust)
@@ -23,6 +26,8 @@ import Data.Int
 
 getSearchTerm :: Entry.Entry -> Utf8
 getSearchTerm e = getVal e Entry.term
+
+printEntry (st:lat:lon:src:rank:type':tags) = tags
 
 buildEntry :: [Field] -> Maybe Entry.Entry
 buildEntry (st:lat:lon:src:rank:type':tags) = Just $ Entry.Entry { Entry.term = (uFromString st)
@@ -35,30 +40,67 @@ buildEntry (st:lat:lon:src:rank:type':tags) = Just $ Entry.Entry { Entry.term = 
 buildEntry [x] = Nothing
 buildEntry [] = Nothing
 
+data JSONTag = JSONTag {  key :: String
+                        , value :: String 
+                       } deriving (Show)
+
+instance JSON.FromJSON JSONTag where
+    parseJSON (JSON.Object v) = JSONTag <$>
+                           v JSON..: "key" <*>
+                           v JSON..: "value"
+    parseJSON _ = mzero
+
+data JSONEntry = JSONEntry {  term :: String
+                            , latitude :: Float
+                            , longitude :: Float
+                            , src :: String
+                            , rank :: Float
+                            , type' :: String
+                            } deriving (Show)
+
+instance JSON.FromJSON JSONEntry where
+     parseJSON (JSON.Object v) = JSONEntry <$>
+                            v JSON..: "searchTerm" <*>
+                            v JSON..: "latitude" <*>
+                            v JSON..: "longitude" <*>
+                            v JSON..: "source" <*>
+                            v JSON..: "rank" <*>
+                            v JSON..: "type"
+     parseJSON _ = mzero
+
+
+indexFile3 f = do
+  contents <- Char8.readFile f
+  let lines = Char8.lines contents
+  let entries = map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  print $ entries !! 0
+
+
+
 indexFile :: String -> IO ()
 indexFile f = do
-	csv <- parseCSVFromFile f
-	case csv of
-		Right d -> decodeFile d
-		Left err -> putStrLn "File has no data"
+  csv <- parseCSVFromFile f
+  case csv of
+    Right d -> decodeFile d
+    Left err -> putStrLn "File has no data"
 
 --Needs a tidy up!! -- Put on some types so we know what we've got
 decodeFile :: CSV -> IO ()
 decodeFile csv = do
-	putStrLn $ "File has " ++ (show $ length csv) ++ " entries"
-	let entries = filter (isJust) $ map (buildEntry) csv
-	let byteEntries = map (messagePut . fromJust) entries
-	let byteEntrySizes = map (ByteString.length) byteEntries
-	let terms = map (sParseTerm . getSearchTerm . fromJust) entries :: [String]
-	let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]
-	let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)
-	let header = encode termsMap
-	let headerSize = ByteString.length header :: Int64
-	
-	writeToFile $ encode headerSize
-	writeToFile header
-	mapM_ (writeToFile) byteEntries
+  putStrLn $ "File has " ++ (show $ length csv) ++ " entries"
+  let entries = filter (isJust) $ map (buildEntry) csv
+  let byteEntries = map (messagePut . fromJust) entries
+  let byteEntrySizes = map (ByteString.length) byteEntries
+  let terms = map (sParseTerm . getSearchTerm . fromJust) entries :: [String]
+  let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]
+  let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)
+  let header = encode termsMap
+  let headerSize = ByteString.length header :: Int64
+  
+  writeToFile $ encode headerSize
+  writeToFile header
+  mapM_ (writeToFile) byteEntries
 
-	where
-		writeToFile = ByteString.appendFile "/tmp/test.pbf" 
+  where
+    writeToFile = ByteString.appendFile "/tmp/test.pbf" 
 
