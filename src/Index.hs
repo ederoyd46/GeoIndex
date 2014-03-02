@@ -7,7 +7,6 @@ import Text.CSV(parseCSVFromFile, Field, CSV)
 import Data.List(map, elemIndex)
 import qualified Data.Map as M
 import Control.Monad(mapM_)
-import qualified PB.Index.Header as Header
 import qualified PB.Index.Entry as Entry
 import Text.ProtocolBuffers.Basic (ByteString, uFromString, uToString, Int64, Seq, Utf8)
 import Text.ProtocolBuffers (getVal)
@@ -25,11 +24,14 @@ import Data.Int
 getSearchTerm :: Entry.Entry -> Utf8
 getSearchTerm e = getVal e Entry.term
 
-buildHeader :: [Utf8] -> [Int64] -> Header.Header
-buildHeader e s = Header.Header (fromList e) (fromList s)
-
 buildEntry :: [Field] -> Maybe Entry.Entry
-buildEntry (st:lat:lon:src:_) = Just $ Entry.Entry (uFromString st) (uFromString lat) (uFromString lon) (uFromString src)
+buildEntry (st:lat:lon:src:rank:type':tags) = Just $ Entry.Entry { Entry.term = (uFromString st)
+                                                              , Entry.latitude = (uFromString lat)
+                                                              , Entry.longitude = (uFromString lon) 
+                                                              , Entry.src = (uFromString src)
+                                                              , Entry.rank = (uFromString rank)
+                                                              , Entry.type' = (uFromString type')
+                                                              , Entry.tags = (fromList []) }
 buildEntry [x] = Nothing
 buildEntry [] = Nothing
 
