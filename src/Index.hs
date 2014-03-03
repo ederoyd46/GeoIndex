@@ -40,22 +40,13 @@ buildEntry (st:lat:lon:src:rank:type':tags) = Just $ Entry.Entry { Entry.term = 
 buildEntry [x] = Nothing
 buildEntry [] = Nothing
 
-data JSONTag = JSONTag {  key :: String
-                        , value :: String 
-                       } deriving (Show)
-
-instance JSON.FromJSON JSONTag where
-    parseJSON (JSON.Object v) = JSONTag <$>
-                           v JSON..: "key" <*>
-                           v JSON..: "value"
-    parseJSON _ = mzero
-
 data JSONEntry = JSONEntry {  term :: String
                             , latitude :: Float
                             , longitude :: Float
-                            , src :: String
+                            , source :: String
                             , rank :: Float
                             , type' :: String
+                            , tags :: (M.Map String String)
                             } deriving (Show)
 
 instance JSON.FromJSON JSONEntry where
@@ -65,16 +56,27 @@ instance JSON.FromJSON JSONEntry where
                             v JSON..: "longitude" <*>
                             v JSON..: "source" <*>
                             v JSON..: "rank" <*>
-                            v JSON..: "type"
+                            v JSON..: "type" <*>
+                            v JSON..: "tags"
      parseJSON _ = mzero
 
 
 indexFile3 f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
-  let entries = map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  let entries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  {-let indexEntries = map (buildEntry3) entries-}
   print $ entries !! 0
 
+
+buildEntry3 :: JSONEntry -> Entry.Entry
+buildEntry3 e = Entry.Entry { Entry.term = (uFromString $ term e)
+                            , Entry.latitude = (uFromString $ show $ latitude e)
+                            , Entry.longitude = (uFromString $ show $ longitude e) 
+                            , Entry.src = (uFromString $ source e)
+                            , Entry.rank = (uFromString $ show $ rank e)
+                            , Entry.type' = (uFromString $ type' e)
+                            , Entry.tags = (fromList []) }
 
 
 indexFile :: String -> IO ()
