@@ -8,7 +8,7 @@ option java_package = "PB.Index";
 
 message Tag {
   required string key = 1;
-  optional string value = 2;
+  required string value = 2;
 }
 
 message Entry {

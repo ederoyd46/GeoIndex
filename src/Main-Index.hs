@@ -4,4 +4,4 @@ import Index
 import System.Environment (getArgs)
 
 main :: IO ()
-main = indexFile "/var/development/geodata.csv" 
+main = indexFile "/var/development/geodata.json" 
