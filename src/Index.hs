@@ -48,11 +48,13 @@ instance JSON.FromJSON JSONEntry where
                             v JSON..: "tags"
      parseJSON _ = mzero
 
+indexFile :: String -> IO ()
 indexFile f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
   let entries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
   let indexEntries = map (buildEntry) entries
+  {-print $ indexEntries !! 0-}
   decodeFile indexEntries
 
 
@@ -65,7 +67,8 @@ buildEntry e = do
               , Entry.src = (uFromString $ source e)
               , Entry.rank = (uFromString $ show $ rank e)
               , Entry.type' = (uFromString $ type' e)
-              , Entry.tags = (fromList convertTags)}
+              , Entry.tags = (fromList convertTags)
+              }
 
 --Needs a tidy up!! -- Put on some types so we know what we've got
 decodeFile :: [Entry.Entry] -> IO ()
