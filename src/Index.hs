@@ -5,6 +5,7 @@ module Index where
 import Common
 import Text.CSV(parseCSVFromFile, Field, CSV)
 import Data.List(map, elemIndex)
+import qualified Data.Set as Set (fromList, toList)
 import qualified Data.Map as M
 import Control.Monad(mapM_, mzero)
 import qualified PB.Index.Entry as Entry
@@ -55,7 +56,8 @@ indexFile f = do
   let entries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
   let indexEntries = map (buildEntry) entries
   {-print $ indexEntries !! 0-}
-  decodeFile indexEntries
+  {-decodeFile indexEntries-}
+  buildTerms indexEntries
 
 
 buildEntry :: JSONEntry -> Entry.Entry
@@ -70,6 +72,42 @@ buildEntry e = do
               , Entry.tags = (fromList convertTags)
               }
 
+
+rootTermLimit :: Int
+rootTermLimit = 3
+
+--rootTerm -> term -> entries
+buildTerms :: [Entry.Entry] -> IO ()
+buildTerms entries = do
+  let terms = cleanup $ map (sParseTerm . getSearchTerm) entries :: [String]
+  let termEntries = map (\k ->
+                          filter (
+                            \e -> (sParseTerm (getSearchTerm e)) == k
+                          ) entries
+                        ) terms
+  let termEntryMap = M.fromList $ zip terms termEntries
+
+  let rootTerms = cleanup $ map (take rootTermLimit) terms
+  let rootTermEntries = map (\rt -> 
+                          M.filterWithKey (\t _ -> 
+                            rt == take rootTermLimit t
+                          ) termEntryMap 
+                        ) rootTerms
+
+
+  let rootMap = M.fromList $ zip rootTerms rootTermEntries
+  print $ length rootTermEntries
+  print $ length rootTerms
+  print $ M.lookup "LEE" rootMap
+  print "done" 
+  
+  
+  
+  where
+    cleanup = unique . removeBlank
+    unique = Set.toList . Set.fromList
+    removeBlank = filter (/="") 
+
 --Needs a tidy up!! -- Put on some types so we know what we've got
 decodeFile :: [Entry.Entry] -> IO ()
 decodeFile entries = do
@@ -77,6 +115,11 @@ decodeFile entries = do
   let byteEntries = map (messagePut) entries
   let byteEntrySizes = map (ByteString.length) byteEntries
   let terms = map (sParseTerm . getSearchTerm) entries :: [String]
+  let rootTerms = map (take 3) terms
+
+
+
+
   let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]
   let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)
   let header = encode termsMap

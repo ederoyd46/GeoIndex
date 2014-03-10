@@ -1,19 +1,19 @@
 print("Dropping Existing Search Terms");
 db.Location_Index.drop();
 
-print("Building PostalCode Terms");
-var postalCodes = db.PostalCode.find({"latitude":{$ne:""}, "longitude":{$ne:""}});
-postalCodes.forEach(function(r) {
-  var newRecord = { searchTerm: r.postalCode
-                  , latitude: r.latitude
-                  , longitude: r.longitude
-                  , source: "GEONAMES-POSTCODE"
-                  , rank: 200
-                  , type: "POSTCODE"
-                  , tags: {}
-                  };
-  db.Location_Index.save(newRecord);
-});
+//print("Building PostalCode Terms");
+//var postalCodes = db.PostalCode.find({"latitude":{$ne:""}, "longitude":{$ne:""}});
+//postalCodes.forEach(function(r) {
+  //var newRecord = { searchTerm: r.postalCode
+                  //, latitude: r.latitude
+                  //, longitude: r.longitude
+                  //, source: "GEONAMES-POSTCODE"
+                  //, rank: 200
+                  //, type: "POSTCODE"
+                  //, tags: {}
+                  //};
+  //db.Location_Index.save(newRecord);
+//});
 
 print("Building Node Place Initial Terms");
 var nodePlace = db.node.find({"tags.place": {$exists: true}, "tags.name": {$exists: true}});
