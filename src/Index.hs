@@ -49,15 +49,34 @@ instance JSON.FromJSON JSONEntry where
                             v JSON..: "tags"
      parseJSON _ = mzero
 
+rootTermLimit :: Int
+rootTermLimit = 3
+
 indexFile :: String -> IO ()
 indexFile f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
   let entries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  let indexKeys = map (parseTerm' . term) entries
   let indexEntries = map (buildEntry) entries
-  {-print $ indexEntries !! 0-}
-  {-decodeFile indexEntries-}
-  buildTerms indexEntries
+
+  --Binary Data
+  let binEntries = map (messagePut) indexEntries -- Should be merged with previous line
+  let binEntrySizes = map (ByteString.length) binEntries
+  let binOffsets = scanl (+) 0 binEntrySizes :: [Int64]
+  
+  --Index Header Data
+  let indexHeaderData = zip3 indexKeys binOffsets binEntrySizes
+
+  {-let dataTree = buildDataTree indexEntries-}
+  print $ filter (\(e,f,g) -> e == "LEEDS") indexHeaderData
+
+  {-writeIndexFile dataTree-}
+
+
+{-writeEntries :: [Entry.Entry] -> Map (-}
+{-writeEntries indexEntries = do-}
+  
 
 
 buildEntry :: JSONEntry -> Entry.Entry
@@ -73,12 +92,8 @@ buildEntry e = do
               }
 
 
-rootTermLimit :: Int
-rootTermLimit = 3
-
---rootTerm -> term -> entries
-buildTerms :: [Entry.Entry] -> IO ()
-buildTerms entries = do
+buildDataTree :: [Entry.Entry] -> M.Map String (M.Map String [Entry.Entry])
+buildDataTree entries = do
   let terms = cleanup $ map (sParseTerm . getSearchTerm) entries :: [String]
   let termEntries = map (\k ->
                           filter (
@@ -93,41 +108,65 @@ buildTerms entries = do
                             rt == take rootTermLimit t
                           ) termEntryMap 
                         ) rootTerms
-
-
-  let rootMap = M.fromList $ zip rootTerms rootTermEntries
-  print $ length rootTermEntries
-  print $ length rootTerms
-  print $ M.lookup "LEE" rootMap
-  print "done" 
-  
-  
-  
+  M.fromList $ zip rootTerms rootTermEntries
   where
     cleanup = unique . removeBlank
     unique = Set.toList . Set.fromList
     removeBlank = filter (/="") 
 
+
+writeIndexFile :: M.Map String (M.Map String [Entry.Entry]) -> IO ()
+writeIndexFile dataTree = do
+  putStrLn $ "File has " ++ (show . length $ M.keys dataTree) ++ " root entries"
+  -- ROOT
+  --    | TERM
+  --          | ENTRY MAP
+  -- rt = root term
+ 
+  let rootBlar = M.map
+
+  let rootOffset = map (\rt -> do
+                      let rte = M.lookup rt dataTree
+                      {-M.map (\tk tvm -> do-}
+                        
+                      {-) rte-}
+                      rte
+                   ) (M.keys dataTree)
+  print $ rootOffset
+  {-let byteEntries = map (messagePut) entries-}
+  {-let byteEntrySizes = map (ByteString.length) byteEntries-}
+  {-let terms = map (sParseTerm . getSearchTerm) entries :: [String]-}
+  {-let rootTerms = map (take 3) terms-}
+
+  {-let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]-}
+  {-let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)-}
+  {-let header = encode termsMap-}
+  {-let headerSize = ByteString.length header :: Int64-}
+  {-writeToFile $ encode headerSize-}
+  {-writeToFile header-}
+  {-mapM_ (writeToFile) byteEntries-}
+  {-where-}
+    {-writeToFile = ByteString.appendFile "/tmp/test.pbf" -}
+
+
+
 --Needs a tidy up!! -- Put on some types so we know what we've got
-decodeFile :: [Entry.Entry] -> IO ()
-decodeFile entries = do
-  putStrLn $ "File has " ++ (show $ length entries) ++ " entries"
-  let byteEntries = map (messagePut) entries
-  let byteEntrySizes = map (ByteString.length) byteEntries
-  let terms = map (sParseTerm . getSearchTerm) entries :: [String]
-  let rootTerms = map (take 3) terms
+{-decodeFile :: [Entry.Entry] -> IO ()-}
+{-decodeFile entries = do-}
+  {-putStrLn $ "File has " ++ (show $ length entries) ++ " entries"-}
+  {-let byteEntries = map (messagePut) entries-}
+  {-let byteEntrySizes = map (ByteString.length) byteEntries-}
+  {-let terms = map (sParseTerm . getSearchTerm) entries :: [String]-}
+  {-let rootTerms = map (take 3) terms-}
 
-
-
-
-  let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]
-  let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)
-  let header = encode termsMap
-  let headerSize = ByteString.length header :: Int64
-  writeToFile $ encode headerSize
-  writeToFile header
-  mapM_ (writeToFile) byteEntries
-  where
-    writeToFile = ByteString.appendFile "/tmp/test.pbf" 
+  {-let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]-}
+  {-let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)-}
+  {-let header = encode termsMap-}
+  {-let headerSize = ByteString.length header :: Int64-}
+  {-writeToFile $ encode headerSize-}
+  {-writeToFile header-}
+  {-mapM_ (writeToFile) byteEntries-}
+  {-where-}
+    {-writeToFile = ByteString.appendFile "/tmp/test.pbf" -}
 
 
