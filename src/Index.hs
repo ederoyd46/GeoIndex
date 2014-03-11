@@ -56,64 +56,69 @@ indexFile :: String -> IO ()
 indexFile f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
-  let entries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
-  let indexKeys = map (parseTerm' . term) entries
-  let indexEntries = map (buildEntry) entries
-
-  --Binary Data
-  let binEntries = map (messagePut) indexEntries -- Should be merged with previous line
-  let binEntrySizes = map (ByteString.length) binEntries
-  let binOffsets = scanl (+) 0 binEntrySizes :: [Int64]
+  let jsonEntries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  let entryData = buildEntries jsonEntries
+  print $ fst entryData !! 501
+  print "done" 
+  buildIndexTree $ fst entryData
   
-  --Index Header Data
-  let indexHeaderData = zip3 indexKeys binOffsets binEntrySizes
-
   {-let dataTree = buildDataTree indexEntries-}
-  print $ filter (\(e,f,g) -> e == "LEEDS") indexHeaderData
+  {-print $ filter (\(e,_,_) -> e == "LEEDS") indexHeaderData-}
 
   {-writeIndexFile dataTree-}
 
 
-{-writeEntries :: [Entry.Entry] -> Map (-}
-{-writeEntries indexEntries = do-}
+buildEntries :: [JSONEntry] -> ([(String, Int64, Int64)], [ByteString])
+buildEntries jsonEntries = do
+  let keys = map (parseTerm' . term) jsonEntries
+  let entries = map (messagePut . buildEntry) jsonEntries
+  let entrySizes = map (ByteString.length) entries
+  let offsets = scanl (+) 0 entrySizes :: [Int64]
+  --Index Header Data
+  let indexData = zip3 keys offsets entrySizes
+  (indexData, entries)
+  where
+    buildEntry :: JSONEntry -> Entry.Entry
+    buildEntry e = do
+      let convertTags = map (\i -> Tag.Tag (uFromString (fst i)) (uFromString (snd i))) $ M.toList $ tags e
+      Entry.Entry { Entry.term = (uFromString $ term e)
+                  , Entry.latitude = (uFromString $ show $ latitude e)
+                  , Entry.longitude = (uFromString $ show $ longitude e) 
+                  , Entry.src = (uFromString $ source e)
+                  , Entry.rank = (uFromString $ show $ rank e)
+                  , Entry.type' = (uFromString $ type' e)
+                  , Entry.tags = (fromList convertTags)
+                  }
+
+buildIndexTree :: [(String, Int64, Int64)] -> IO ()
+buildIndexTree indexData = do
+  let rootTerms = cleanup $ map (\(term,_,_) -> take rootTermLimit term) indexData
+  print $ rootTerms
   
-
-
-buildEntry :: JSONEntry -> Entry.Entry
-buildEntry e = do
-  let convertTags = map (\i -> Tag.Tag (uFromString (fst i)) (uFromString (snd i))) $ M.toList $ tags e
-  Entry.Entry { Entry.term = (uFromString $ term e)
-              , Entry.latitude = (uFromString $ show $ latitude e)
-              , Entry.longitude = (uFromString $ show $ longitude e) 
-              , Entry.src = (uFromString $ source e)
-              , Entry.rank = (uFromString $ show $ rank e)
-              , Entry.type' = (uFromString $ type' e)
-              , Entry.tags = (fromList convertTags)
-              }
-
-
-buildDataTree :: [Entry.Entry] -> M.Map String (M.Map String [Entry.Entry])
-buildDataTree entries = do
-  let terms = cleanup $ map (sParseTerm . getSearchTerm) entries :: [String]
-  let termEntries = map (\k ->
-                          filter (
-                            \e -> (sParseTerm (getSearchTerm e)) == k
-                          ) entries
-                        ) terms
-  let termEntryMap = M.fromList $ zip terms termEntries
-
-  let rootTerms = cleanup $ map (take rootTermLimit) terms
-  let rootTermEntries = map (\rt -> 
-                          M.filterWithKey (\t _ -> 
-                            rt == take rootTermLimit t
-                          ) termEntryMap 
-                        ) rootTerms
-  M.fromList $ zip rootTerms rootTermEntries
   where
     cleanup = unique . removeBlank
     unique = Set.toList . Set.fromList
-    removeBlank = filter (/="") 
+    removeBlank = filter (/="")
 
+
+
+
+
+  {-let terms = cleanup $ map (sParseTerm . getSearchTerm) entries :: [String]-}
+  {-let termEntries = map (\k ->-}
+                          {-filter (-}
+                            {-\e -> (sParseTerm (getSearchTerm e)) == k-}
+                          {-) entries-}
+                        {-) terms-}
+  {-let termEntryMap = M.fromList $ zip terms termEntries-}
+
+  {-let rootTerms = cleanup $ map (take rootTermLimit) terms-}
+  {-let rootTermEntries = map (\rt -> -}
+                          {-M.filterWithKey (\t _ -> -}
+                            {-rt == take rootTermLimit t-}
+                          {-) termEntryMap -}
+                        {-) rootTerms-}
+  {-M.fromList $ zip rootTerms rootTermEntries-}
 
 writeIndexFile :: M.Map String (M.Map String [Entry.Entry]) -> IO ()
 writeIndexFile dataTree = do
