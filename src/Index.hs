@@ -58,24 +58,63 @@ indexFile f = do
   let lines = Char8.lines contents
   let jsonEntries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
   let entryData = buildEntries jsonEntries
-  print $ fst entryData !! 501
-  print "done" 
-  buildIndexTree $ fst entryData
+  let indexData = buildIndex $ fst entryData
+  writeIndexFile indexData (snd entryData)
+
+writeIndexFile :: (Int64, ByteString, [ByteString]) -> [ByteString] -> IO ()
+writeIndexFile (rootSize,rootIndex,subIndex) entries = do
+  writeToFile $ encode rootSize
+  writeToFile rootIndex
+  mapM_ (writeToFile) subIndex
+  mapM_ (writeToFile) entries
+  where
+    writeToFile = ByteString.appendFile "/tmp/test.pbf"
+
+
+buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, [ByteString])
+buildIndex indexData = do
+  let terms = map (\(term,_) -> term) indexData
+  let rootTerms = cleanup $ map (\(term,_) -> take rootTermLimit term) indexData
+  let indexDataMap = M.fromList $ map (
+        \t -> do
+          let matches = map (snd) $ filter (
+                \(term,_) -> 
+                  t == term
+                ) indexData
+          (t,matches)
+        ) terms
   
-  {-let dataTree = buildDataTree indexEntries-}
-  {-print $ filter (\(e,_,_) -> e == "LEEDS") indexHeaderData-}
+  let subIndex = map (
+        \rt -> do
+          let matches = M.filterWithKey (
+                \k v -> 
+                  (take rootTermLimit k) == rt
+                ) indexDataMap
+          (rt, encode matches)
+        ) rootTerms
+  
+  let subIndexTerms = map (fst) subIndex
+  let subIndexEntries = map (snd) subIndex
+  let sizes = map (ByteString.length) subIndexEntries
+  let offsets = scanl (+) 0 sizes :: [Int64]
 
-  {-writeIndexFile dataTree-}
+  let rootIndex = zip subIndexTerms $ zip offsets sizes
+  let rootIndexEntries = encode rootIndex
+  let rootIndexSize = ByteString.length rootIndexEntries :: Int64
+  (rootIndexSize,rootIndexEntries,subIndexEntries) 
+  where
+    cleanup = unique . removeBlank
+    unique = Set.toList . Set.fromList
+    removeBlank = filter (/="")
 
 
-buildEntries :: [JSONEntry] -> ([(String, Int64, Int64)], [ByteString])
+buildEntries :: [JSONEntry] -> ([(String, (Int64, Int64))], [ByteString])
 buildEntries jsonEntries = do
   let keys = map (parseTerm' . term) jsonEntries
   let entries = map (messagePut . buildEntry) jsonEntries
   let entrySizes = map (ByteString.length) entries
   let offsets = scanl (+) 0 entrySizes :: [Int64]
-  --Index Header Data
-  let indexData = zip3 keys offsets entrySizes
+  let indexData = zip keys $ zip offsets entrySizes
   (indexData, entries)
   where
     buildEntry :: JSONEntry -> Entry.Entry
@@ -90,54 +129,25 @@ buildEntries jsonEntries = do
                   , Entry.tags = (fromList convertTags)
                   }
 
-buildIndexTree :: [(String, Int64, Int64)] -> IO ()
-buildIndexTree indexData = do
-  let rootTerms = cleanup $ map (\(term,_,_) -> take rootTermLimit term) indexData
-  print $ rootTerms
-  
-  where
-    cleanup = unique . removeBlank
-    unique = Set.toList . Set.fromList
-    removeBlank = filter (/="")
 
-
-
-
-
-  {-let terms = cleanup $ map (sParseTerm . getSearchTerm) entries :: [String]-}
-  {-let termEntries = map (\k ->-}
-                          {-filter (-}
-                            {-\e -> (sParseTerm (getSearchTerm e)) == k-}
-                          {-) entries-}
-                        {-) terms-}
-  {-let termEntryMap = M.fromList $ zip terms termEntries-}
-
-  {-let rootTerms = cleanup $ map (take rootTermLimit) terms-}
-  {-let rootTermEntries = map (\rt -> -}
-                          {-M.filterWithKey (\t _ -> -}
-                            {-rt == take rootTermLimit t-}
-                          {-) termEntryMap -}
-                        {-) rootTerms-}
-  {-M.fromList $ zip rootTerms rootTermEntries-}
-
-writeIndexFile :: M.Map String (M.Map String [Entry.Entry]) -> IO ()
-writeIndexFile dataTree = do
-  putStrLn $ "File has " ++ (show . length $ M.keys dataTree) ++ " root entries"
-  -- ROOT
-  --    | TERM
-  --          | ENTRY MAP
-  -- rt = root term
+{-writeIndexFile :: M.Map String (M.Map String [Entry.Entry]) -> IO ()-}
+{-writeIndexFile dataTree = do-}
+  {-putStrLn $ "File has " ++ (show . length $ M.keys dataTree) ++ " root entries"-}
+  {--- ROOT-}
+  {---    | TERM-}
+  {---          | ENTRY MAP-}
+  {--- rt = root term-}
  
-  let rootBlar = M.map
+  {-let rootBlar = M.map-}
 
-  let rootOffset = map (\rt -> do
-                      let rte = M.lookup rt dataTree
-                      {-M.map (\tk tvm -> do-}
+  {-let rootOffset = map (\rt -> do-}
+                      {-let rte = M.lookup rt dataTree-}
+                      {-[>M.map (\tk tvm -> do<]-}
                         
-                      {-) rte-}
-                      rte
-                   ) (M.keys dataTree)
-  print $ rootOffset
+                      {-[>) rte<]-}
+                      {-rte-}
+                   {-) (M.keys dataTree)-}
+  {-print $ rootOffset-}
   {-let byteEntries = map (messagePut) entries-}
   {-let byteEntrySizes = map (ByteString.length) byteEntries-}
   {-let terms = map (sParseTerm . getSearchTerm) entries :: [String]-}
