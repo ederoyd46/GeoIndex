@@ -20,8 +20,7 @@ import Data.Foldable (toList)
 import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile)
 import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines, length)
 import qualified Data.Aeson as JSON
-import Control.Applicative
-
+import JSONEntry
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Maybe(isJust, fromJust)
 import Data.Int
@@ -29,28 +28,9 @@ import Data.Int
 getSearchTerm :: Entry.Entry -> Utf8
 getSearchTerm e = getVal e Entry.term
 
-data JSONEntry = JSONEntry {  term :: String
-                            , latitude :: Float
-                            , longitude :: Float
-                            , source :: String
-                            , rank :: Float
-                            , type' :: String
-                            , tags :: (M.Map String String)
-                            } deriving (Show)
-
-instance JSON.FromJSON JSONEntry where
-     parseJSON (JSON.Object v) = JSONEntry <$>
-                            v JSON..: "searchTerm" <*>
-                            v JSON..: "latitude" <*>
-                            v JSON..: "longitude" <*>
-                            v JSON..: "source" <*>
-                            v JSON..: "rank" <*>
-                            v JSON..: "type" <*>
-                            v JSON..: "tags"
-     parseJSON _ = mzero
-
 rootTermLimit :: Int
 rootTermLimit = 3
+
 
 indexFile :: String -> IO ()
 indexFile f = do
@@ -60,15 +40,15 @@ indexFile f = do
   let entryData = buildEntries jsonEntries
   let indexData = buildIndex $ fst entryData
   writeIndexFile indexData (snd entryData)
-
-writeIndexFile :: (Int64, ByteString, [ByteString]) -> [ByteString] -> IO ()
-writeIndexFile (rootSize,rootIndex,subIndex) entries = do
-  writeToFile $ encode rootSize
-  writeToFile rootIndex
-  mapM_ (writeToFile) subIndex
-  mapM_ (writeToFile) entries
   where
-    writeToFile = ByteString.appendFile "/tmp/test.pbf"
+    writeIndexFile :: (Int64, ByteString, [ByteString]) -> [ByteString] -> IO ()
+    writeIndexFile (rootSize,rootIndex,subIndex) entries = do
+      writeToFile $ encode rootSize
+      writeToFile rootIndex
+      mapM_ (writeToFile) subIndex
+      mapM_ (writeToFile) entries
+      where
+        writeToFile = ByteString.appendFile "/tmp/test.pbf"
 
 
 buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, [ByteString])
@@ -98,7 +78,7 @@ buildIndex indexData = do
   let sizes = map (ByteString.length) subIndexEntries
   let offsets = scanl (+) 0 sizes :: [Int64]
 
-  let rootIndex = zip subIndexTerms $ zip offsets sizes
+  let rootIndex = M.fromList $ zip subIndexTerms $ zip offsets sizes
   let rootIndexEntries = encode rootIndex
   let rootIndexSize = ByteString.length rootIndexEntries :: Int64
   (rootIndexSize,rootIndexEntries,subIndexEntries) 
@@ -128,60 +108,5 @@ buildEntries jsonEntries = do
                   , Entry.type' = (uFromString $ type' e)
                   , Entry.tags = (fromList convertTags)
                   }
-
-
-{-writeIndexFile :: M.Map String (M.Map String [Entry.Entry]) -> IO ()-}
-{-writeIndexFile dataTree = do-}
-  {-putStrLn $ "File has " ++ (show . length $ M.keys dataTree) ++ " root entries"-}
-  {--- ROOT-}
-  {---    | TERM-}
-  {---          | ENTRY MAP-}
-  {--- rt = root term-}
- 
-  {-let rootBlar = M.map-}
-
-  {-let rootOffset = map (\rt -> do-}
-                      {-let rte = M.lookup rt dataTree-}
-                      {-[>M.map (\tk tvm -> do<]-}
-                        
-                      {-[>) rte<]-}
-                      {-rte-}
-                   {-) (M.keys dataTree)-}
-  {-print $ rootOffset-}
-  {-let byteEntries = map (messagePut) entries-}
-  {-let byteEntrySizes = map (ByteString.length) byteEntries-}
-  {-let terms = map (sParseTerm . getSearchTerm) entries :: [String]-}
-  {-let rootTerms = map (take 3) terms-}
-
-  {-let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]-}
-  {-let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)-}
-  {-let header = encode termsMap-}
-  {-let headerSize = ByteString.length header :: Int64-}
-  {-writeToFile $ encode headerSize-}
-  {-writeToFile header-}
-  {-mapM_ (writeToFile) byteEntries-}
-  {-where-}
-    {-writeToFile = ByteString.appendFile "/tmp/test.pbf" -}
-
-
-
---Needs a tidy up!! -- Put on some types so we know what we've got
-{-decodeFile :: [Entry.Entry] -> IO ()-}
-{-decodeFile entries = do-}
-  {-putStrLn $ "File has " ++ (show $ length entries) ++ " entries"-}
-  {-let byteEntries = map (messagePut) entries-}
-  {-let byteEntrySizes = map (ByteString.length) byteEntries-}
-  {-let terms = map (sParseTerm . getSearchTerm) entries :: [String]-}
-  {-let rootTerms = map (take 3) terms-}
-
-  {-let byteOffsets = scanl (+) 0 byteEntrySizes :: [Int64]-}
-  {-let termsMap = (M.fromList $ zip terms (zip byteOffsets byteEntrySizes)) :: M.Map String (Int64, Int64)-}
-  {-let header = encode termsMap-}
-  {-let headerSize = ByteString.length header :: Int64-}
-  {-writeToFile $ encode headerSize-}
-  {-writeToFile header-}
-  {-mapM_ (writeToFile) byteEntries-}
-  {-where-}
-    {-writeToFile = ByteString.appendFile "/tmp/test.pbf" -}
 
 
