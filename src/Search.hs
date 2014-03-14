@@ -66,7 +66,7 @@ search s = do
 		{-Nothing -> print "Does not exist"-}
 
 
-{-getSubIndex :: Int64 -> Get (M.Map String (Int64, Int64))-}
+getSubIndex :: Int64 -> Get (M.Map String [(Int64, Int64)])
 getSubIndex subIndexSize = do
     subIndexBytes <- getLazyByteString (fromIntegral subIndexSize)
     let subIndex = decode subIndexBytes :: (M.Map String [(Int64, Int64)])

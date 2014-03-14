@@ -36,16 +36,25 @@ indexFile :: String -> IO ()
 indexFile f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
+  print $ "Parsed to lines"
   let jsonEntries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
+  print $ "Building Entries"
   let entryData = buildEntries jsonEntries
+  print $ "Building Index"
   let indexData = buildIndex $ fst entryData
+  print $ "Writing Index"
   writeIndexFile indexData (snd entryData)
+  print $ "Done"
   where
     writeIndexFile :: (Int64, ByteString, [ByteString]) -> [ByteString] -> IO ()
     writeIndexFile (rootSize,rootIndex,subIndex) entries = do
+      print $ "Writing Root Size: " ++ (show rootSize)
       writeToFile $ encode rootSize
+      print $ "Writing Root Index"
       writeToFile rootIndex
+      print $ "Writing Sub Index"
       mapM_ (writeToFile) subIndex
+      print $ "Writing Entries Index"
       mapM_ (writeToFile) entries
       where
         writeToFile = ByteString.appendFile "/tmp/test.pbf"
