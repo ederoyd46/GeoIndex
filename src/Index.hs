@@ -53,17 +53,14 @@ buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, Int64, ByteStrin
 buildIndex indexData = do
   let terms = map (fst) indexData
   let rootTerms = cleanup $ map (take rootTermLimit) terms
-  let indexData' = map (\(k,v) -> (k,[v])) indexData --fudge the data into a list so we can build the map..
-  let subIndexData = M.toList $ M.fromListWith (++) indexData'
-  
-  let subIndex = M.toList $ M.fromListWith (++) $ map (
-              \v -> do
-                let rootTerm = take rootTermLimit (fst v)
-                (rootTerm, [v])
-              ) subIndexData
+  let indexData' = map (\(k,v) -> (take rootTermLimit k,[(k, [v])])) indexData 
+  --This gives us :: rootkey -> [(key, [(offset, size)])]
+  let subIndex = M.fromListWith (++) indexData'
+  let subIndex' = M.map (M.fromListWith (++)) subIndex
 
-  let subIndexTerms = map (fst) subIndex
-  let subIndexEntries = map (encode . snd) subIndex
+  let subIndexTerms = M.keys subIndex'
+  let subIndexEntries = map (encode) $ M.elems subIndex'
+
   let sizes = map (ByteString.length) subIndexEntries
   let subIndexSize = foldl1 (+) sizes :: Int64
   let offsets = scanl (+) 0 sizes :: [Int64]

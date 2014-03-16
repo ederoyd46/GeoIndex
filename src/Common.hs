@@ -28,3 +28,6 @@ parseTerm' = do
 	let removeSpaces = filter (isAlphaNum)
 	let filterWords = unwords . filter ("NEAR" /=) . filter ("IN" /=) . words
 	removeSpaces . filterWords . filterAlphas
+
+parseRootTerm :: String -> String
+parseRootTerm = take 3 . parseTerm'

@@ -23,61 +23,40 @@ getEntry entrySize = do
     let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
     return entry
 
-{-getHeader :: Get ((M.Map String (Int64, Int64)), Int64)-}
-{-getHeader = do-}
-    {-len <- getWord64be-}
-    {-headerBytes <- getLazyByteString (fromIntegral len)-}
-    {-let header = decode headerBytes :: M.Map String (Int64, Int64)-}
-    {-offset <- bytesRead-}
-    {-return (header, offset)-}
-
-{-search :: String -> IO ()-}
-{-search s = do-}
-	{-handle <- ByteString.readFile "/tmp/test.pbf"-}
-	{-let (header, hoffset) = runGet getHeader handle-}
-	{-case (M.lookup (parseTerm' s) header) of-}
-		{-Just (o,s) -> do-}
-			{-let entryData = ByteString.drop (fromIntegral (hoffset + o)) handle-}
-			{-let entry = runGet (getEntry s) entryData-}
-			{-print entry-}
-		{-Nothing -> print "Does not exist"-}
-
-
-
 search :: String -> IO ()
 search s = do
-  handle <- ByteString.readFile "/tmp/test.pbf"
-  let (header, hoffset) = runGet getHeader handle
-  {-let subIndexLocation = snd $ filter (\rt -> (fst rt) == s) header !! 0-}
-  case (M.lookup s header) of
+  handle <- ByteString.readFile "/tmp/terms.dat"
+  let (header, hoffset, soffset) = runGet getHeader handle
+  let eoffset = hoffset + soffset
+  let rootTerm = parseRootTerm s
+  let term = parseTerm' s
+  case (M.lookup rootTerm header) of
     Just (o,s) -> do
       let subIndexData = ByteString.drop (fromIntegral (hoffset + o)) handle
       let subIndex = runGet (getSubIndex s) subIndexData
-      print subIndex
+      case (M.lookup term subIndex) of
+        Just el -> mapM_ (
+                    \(eo,es) -> do
+                    let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
+                    let entry = runGet (getEntry es) entryData
+                    print entry
+                   ) el
+        Nothing -> print "Sub Entry does not exist"
     Nothing -> print "Does not exist"
-  print "done"
-
-
-	{-case (M.lookup (parseTerm' s) header) of-}
-		{-Just (o,s) -> do-}
-			{-let entryData = ByteString.drop (fromIntegral (hoffset + o)) handle-}
-			{-let entry = runGet (getEntry s) entryData-}
-			{-print entry-}
-		{-Nothing -> print "Does not exist"-}
-
-
+	
+  
 getSubIndex :: Int64 -> Get (M.Map String [(Int64, Int64)])
 getSubIndex subIndexSize = do
     subIndexBytes <- getLazyByteString (fromIntegral subIndexSize)
-    let subIndex = decode subIndexBytes :: (M.Map String [(Int64, Int64)])
+    let subIndex = decode subIndexBytes :: M.Map String [(Int64, Int64)]
     return subIndex
 
-getHeader :: Get ((M.Map String (Int64, Int64)), Int64)
+getHeader :: Get ((M.Map String (Int64, Int64)), Int64, Int64)
 getHeader = do
-    len <- getWord64be
-    headerBytes <- getLazyByteString (fromIntegral len)
+    hlen <- getWord64be
+    headerBytes <- getLazyByteString (fromIntegral hlen)
     let header = decode headerBytes :: (M.Map String (Int64, Int64))
+    slen <- getWord64be
     offset <- bytesRead
-    return (header, offset)
-
+    return (header, offset, (fromIntegral slen))
 
