@@ -14,10 +14,10 @@ import Text.ProtocolBuffers.Basic (ByteString, uFromString, uToString, Int64, Se
 import Text.ProtocolBuffers (getVal)
 import Data.Sequence(fromList)
 import Text.ProtocolBuffers.WireMessage (messagePut)
-import Data.Binary (encode)
+import Data.Binary (encode, decode)
 import Data.Binary.Get (Get, getWord64be)
 import Data.Foldable (toList)
-import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile)
+import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile, concat)
 import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines, length)
 import qualified Data.Aeson as JSON
 import JSONEntry
@@ -31,80 +31,67 @@ getSearchTerm e = getVal e Entry.term
 rootTermLimit :: Int
 rootTermLimit = 3
 
-
 indexFile :: String -> IO ()
 indexFile f = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
-  print $ "Parsed to lines"
   let jsonEntries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
-  print $ "Building Entries"
-  let entryData = buildEntries jsonEntries
-  print $ "Building Index"
-  let indexData = buildIndex $ fst entryData
-  print $ "Writing Index"
-  writeIndexFile indexData (snd entryData)
-  print $ "Done"
+  let entries = buildEntries jsonEntries
+  let indexData = buildIndex $ fst entries
+  writeIndexFile indexData (snd entries)
   where
-    writeIndexFile :: (Int64, ByteString, [ByteString]) -> [ByteString] -> IO ()
-    writeIndexFile (rootSize,rootIndex,subIndex) entries = do
-      print $ "Writing Root Size: " ++ (show rootSize)
-      writeToFile $ encode rootSize
-      print $ "Writing Root Index"
-      writeToFile rootIndex
-      print $ "Writing Sub Index"
-      mapM_ (writeToFile) subIndex
-      print $ "Writing Entries Index"
-      mapM_ (writeToFile) entries
-      where
-        writeToFile = ByteString.appendFile "/tmp/test.pbf"
+    writeIndexFile :: (Int64, ByteString, Int64, ByteString) -> ByteString -> IO ()
+    writeIndexFile (rootSize,rootIndex,subIndexSize,subIndex) entries = do
+      ByteString.writeFile "/tmp/terms.dat" $ ByteString.concat 
+            [ encode rootSize
+            , rootIndex
+            , encode subIndexSize
+            , subIndex
+            , entries]
 
-
-buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, [ByteString])
+buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, Int64, ByteString)
 buildIndex indexData = do
-  let terms = map (\(term,_) -> term) indexData
-  let rootTerms = cleanup $ map (\(term,_) -> take rootTermLimit term) indexData
-  let indexDataMap = M.fromList $ map (
-        \t -> do
-          let matches = map (snd) $ filter (
-                \(term,_) -> 
-                  t == term
-                ) indexData
-          (t,matches)
-        ) terms
+  let terms = map (fst) indexData
+  let rootTerms = cleanup $ map (take rootTermLimit) terms
+  let indexData' = map (\(k,v) -> (k,[v])) indexData --fudge the data into a list so we can build the map..
+  let subIndexData = M.toList $ M.fromListWith (++) indexData'
   
-  let subIndex = map (
-        \rt -> do
-          let matches = M.filterWithKey (
-                \k v -> 
-                  (take rootTermLimit k) == rt
-                ) indexDataMap
-          (rt, encode matches)
-        ) rootTerms
-  
-  let subIndexTerms = map (fst) subIndex
-  let subIndexEntries = map (snd) subIndex
-  let sizes = map (ByteString.length) subIndexEntries
-  let offsets = scanl (+) 0 sizes :: [Int64]
+  let subIndex = M.toList $ M.fromListWith (++) $ map (
+              \v -> do
+                let rootTerm = take rootTermLimit (fst v)
+                (rootTerm, [v])
+              ) subIndexData
 
-  let rootIndex = M.fromList $ zip subIndexTerms $ zip offsets sizes
+  let subIndexTerms = map (fst) subIndex
+  let subIndexEntries = map (encode . snd) subIndex
+  let sizes = map (ByteString.length) subIndexEntries
+  let subIndexSize = foldl1 (+) sizes :: Int64
+  let offsets = scanl (+) 0 sizes :: [Int64]
+  
+  let rootIndex = zip subIndexTerms $ zip offsets sizes
   let rootIndexEntries = encode rootIndex
   let rootIndexSize = ByteString.length rootIndexEntries :: Int64
-  (rootIndexSize,rootIndexEntries,subIndexEntries) 
+  (rootIndexSize,rootIndexEntries,subIndexSize,(ByteString.concat subIndexEntries))
   where
     cleanup = unique . removeBlank
     unique = Set.toList . Set.fromList
     removeBlank = filter (/="")
 
 
-buildEntries :: [JSONEntry] -> ([(String, (Int64, Int64))], [ByteString])
+buildEntries :: [JSONEntry] -> ([(String, (Int64, Int64))], ByteString)
 buildEntries jsonEntries = do
   let keys = map (parseTerm' . term) jsonEntries
-  let entries = map (messagePut . buildEntry) jsonEntries
-  let entrySizes = map (ByteString.length) entries
+  let entries = map (
+        \e -> do
+          let b = messagePut . buildEntry $ e
+          ((ByteString.length b), b)
+        ) jsonEntries
+  
+  let entryData = map (snd) entries
+  let entrySizes = map (fst) entries
   let offsets = scanl (+) 0 entrySizes :: [Int64]
   let indexData = zip keys $ zip offsets entrySizes
-  (indexData, entries)
+  (indexData, (ByteString.concat entryData))
   where
     buildEntry :: JSONEntry -> Entry.Entry
     buildEntry e = do
@@ -117,5 +104,4 @@ buildEntries jsonEntries = do
                   , Entry.type' = (uFromString $ type' e)
                   , Entry.tags = (fromList convertTags)
                   }
-
 
