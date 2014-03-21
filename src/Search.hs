@@ -17,12 +17,6 @@ import Data.Sequence(elemIndexL,fromList)
 import Data.Int
 import qualified Data.Map as M
 
-getEntry :: Int64 -> Get Entry.Entry
-getEntry entrySize = do
-    entryBytes <- getLazyByteString (fromIntegral entrySize)
-    let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
-    return entry
-
 search :: String -> IO ()
 search s = do
   handle <- ByteString.readFile "/tmp/terms.dat"
@@ -37,14 +31,20 @@ search s = do
       case (M.lookup term subIndex) of
         Just el -> mapM_ (
                     \(eo,es) -> do
-                    let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
-                    let entry = runGet (getEntry es) entryData
-                    print entry
+                      let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
+                      let entry = runGet (getEntry es) entryData
+                      print entry
                    ) el
         Nothing -> print "Sub Entry does not exist"
     Nothing -> print "Does not exist"
 	
-  
+
+getEntry :: Int64 -> Get Entry.Entry
+getEntry entrySize = do
+    entryBytes <- getLazyByteString (fromIntegral entrySize)
+    let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
+    return entry
+ 
 getSubIndex :: Int64 -> Get (M.Map String [(Int64, Int64)])
 getSubIndex subIndexSize = do
     subIndexBytes <- getLazyByteString (fromIntegral subIndexSize)
