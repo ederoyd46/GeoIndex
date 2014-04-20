@@ -8,7 +8,17 @@ import Control.Monad(when, forever)
 
 main :: IO ()
 main = do 
+	args <- getArgs
+	when (length args < 1) showUsage
+	let indexFile = args !! 0
 	putStrLn "Enter search term: " 
 	forever $ do
 		term <- getLine
-		search term
+		search indexFile term
+
+showUsage :: IO ()
+showUsage = do
+      hPutStrLn stderr "usage: indexFile"
+      hPutStrLn stderr "example: geo-server geodata.idx"
+      exitFailure
+

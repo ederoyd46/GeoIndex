@@ -31,8 +31,8 @@ getSearchTerm e = getVal e Entry.term
 rootTermLimit :: Int
 rootTermLimit = 3
 
-indexFile :: String -> IO ()
-indexFile f = do
+indexFile :: String -> String -> IO ()
+indexFile f i = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
   let jsonEntries = map (fromJust) . filter (isJust) $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines
@@ -42,7 +42,7 @@ indexFile f = do
   where
     writeIndexFile :: (Int64, ByteString, Int64, ByteString) -> ByteString -> IO ()
     writeIndexFile (rootSize,rootIndex,subIndexSize,subIndex) entries = do
-      ByteString.writeFile "/tmp/terms.dat" $ ByteString.concat 
+      ByteString.writeFile i $ ByteString.concat 
             [ encode rootSize
             , rootIndex
             , encode subIndexSize

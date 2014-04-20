@@ -9,12 +9,14 @@ import Control.Monad(when)
 main :: IO ()
 main = do 
 	args <- getArgs
-	when (length args < 1) showUsage
-	let term = args !! 0
-	search term
+	when (length args < 2) showUsage
+	let indexFile = args !! 0
+	let term = args !! 1
+	search indexFile term
 
 showUsage :: IO ()
 showUsage = do
-      hPutStrLn stderr "usage: term"
-      hPutStrLn stderr "example: Geo-Search 'LEEDS' "
+      hPutStrLn stderr "usage: indexFile term"
+      hPutStrLn stderr "example: geo-search geodata.idx 'LEEDS'"
       exitFailure
+

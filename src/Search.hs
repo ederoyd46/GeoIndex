@@ -17,9 +17,9 @@ import Data.Sequence(elemIndexL,fromList)
 import Data.Int
 import qualified Data.Map as M
 
-search :: String -> IO ()
-search s = do
-  handle <- ByteString.readFile "/tmp/terms.dat"
+search :: String -> String -> IO ()
+search f s = do
+  handle <- ByteString.readFile f
   let (header, hoffset, soffset) = runGet getHeader handle
   let eoffset = hoffset + soffset
   let rootTerm = parseRootTerm s
