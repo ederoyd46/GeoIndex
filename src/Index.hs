@@ -3,21 +3,17 @@
 module Index where
 
 import Common
-import Data.List(map, elemIndex)
 import qualified Data.Set as Set (fromList, toList)
 import qualified Data.Map as M
-import Control.Monad(mapM_, mzero)
 import qualified PB.Index.Entry as Entry
 import qualified PB.Index.Tag as Tag
-import Text.ProtocolBuffers.Basic (ByteString, uFromString, uToString, Int64, Seq, Utf8)
+import Text.ProtocolBuffers.Basic (ByteString, uFromString, Utf8)
 import Text.ProtocolBuffers (getVal)
 import Data.Sequence(fromList)
 import Text.ProtocolBuffers.WireMessage (messagePut)
-import Data.Binary (encode, decode)
-import Data.Binary.Get (Get, getWord64be)
-import Data.Foldable (toList)
-import qualified Data.ByteString.Lazy as ByteString (readFile, writeFile, length, appendFile, concat)
-import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines, length)
+import Data.Binary (encode)
+import qualified Data.ByteString.Lazy as ByteString (writeFile, length, concat)
+import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines)
 import qualified Data.Aeson as JSON
 import JSONEntry
 --import Codec.Compression.Zlib as Zlib (compress, decompress)

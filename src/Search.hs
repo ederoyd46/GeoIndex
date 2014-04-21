@@ -3,17 +3,13 @@
 module Search where
 
 import Common
-import Data.List(map)
 import qualified PB.Index.Entry as Entry
-import Text.ProtocolBuffers.Basic (ByteString, uToString, uFromString, Int64, Utf8)
-import Text.ProtocolBuffers (getVal)
+import Text.ProtocolBuffers.Basic (ByteString)
 import Text.ProtocolBuffers.WireMessage (messageGet)
 import Data.Binary (decode)
-import Data.Binary.Get (Get, getWord64be, getByteString, getLazyByteString, runGet, bytesRead, skip)
-import Data.Foldable (toList)
-import qualified Data.ByteString.Lazy as ByteString (readFile, length, drop)
+import Data.Binary.Get (Get, getWord64be, getLazyByteString, runGet, bytesRead)
+import qualified Data.ByteString.Lazy as ByteString (readFile, drop)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
-import Data.Sequence(elemIndexL,fromList)
 import Data.Int
 import qualified Data.Map as M
 
