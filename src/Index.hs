@@ -3,7 +3,6 @@
 module Index where
 
 import Common
-import Text.CSV(parseCSVFromFile, Field, CSV)
 import Data.List(map, elemIndex)
 import qualified Data.Set as Set (fromList, toList)
 import qualified Data.Map as M
