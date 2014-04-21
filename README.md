@@ -22,20 +22,14 @@ Usage
 
 There are three client applications to build and search the index;
 
-geo-index
+- geo-index
+- usage: fileToIndex indexFile
+- example: geo-index geodata.json geodata.idx
 
-usage: fileToIndex indexFile
+- geo-search
+- usage: indexFile term
+- example: geo-search geodata.idx 'LEEDS'
 
-example: geo-index geodata.json geodata.idx
-
-geo-search
-
-usage: indexFile term
-
-example: geo-search geodata.idx 'LEEDS'
-
-geo-server
-
-usage: indexFile
-
-example: geo-server geodata.idx
+- geo-server
+- usage: indexFile
+- example: geo-server geodata.idx
