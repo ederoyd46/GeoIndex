@@ -26,9 +26,11 @@ There are three client applications to build and search the index;
 - usage: fileToIndex indexFile
 - example: geo-index geodata.json geodata.idx
 
+
 - geo-search
 - usage: indexFile term
 - example: geo-search geodata.idx 'LEEDS'
+
 
 - geo-server
 - usage: indexFile
