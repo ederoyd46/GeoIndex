@@ -24,11 +24,11 @@ search f s = do
   let eoffset = hoffset + soffset
   let rootTerm = parseRootTerm s
   let term = parseTerm' s
-  case (M.lookup rootTerm header) of
+  case M.lookup rootTerm header of
     Just (o,s) -> do
       let subIndexData = ByteString.drop (fromIntegral (hoffset + o)) handle
       let subIndex = runGet (getSubIndex s) subIndexData
-      case (M.lookup term subIndex) of
+      case M.lookup term subIndex of
         Just el -> mapM_ (
                     \(eo,es) -> do
                       let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
@@ -51,12 +51,12 @@ getSubIndex subIndexSize = do
     let subIndex = decode subIndexBytes :: M.Map String [(Int64, Int64)]
     return subIndex
 
-getHeader :: Get ((M.Map String (Int64, Int64)), Int64, Int64)
+getHeader :: Get (M.Map String (Int64, Int64), Int64, Int64)
 getHeader = do
     hlen <- getWord64be
     headerBytes <- getLazyByteString (fromIntegral hlen)
     let header = decode headerBytes :: (M.Map String (Int64, Int64))
     slen <- getWord64be
     offset <- bytesRead
-    return (header, offset, (fromIntegral slen))
+    return (header, offset, fromIntegral slen)
 

@@ -10,7 +10,7 @@ main :: IO ()
 main = do 
 	args <- getArgs
 	when (length args < 1) showUsage
-	let indexFile = args !! 0
+	let indexFile = head args
 	putStrLn "Enter search term: " 
 	forever $ do
 		term <- getLine

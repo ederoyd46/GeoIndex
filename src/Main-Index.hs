@@ -10,7 +10,7 @@ main :: IO ()
 main = do 
   args <- getArgs
   when (length args < 1) showUsage
-  let fileToIndex = args !! 0
+  let fileToIndex = head args
   let indexOutputFile = args !! 1
   indexFile fileToIndex indexOutputFile
 

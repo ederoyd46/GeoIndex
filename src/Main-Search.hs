@@ -10,7 +10,7 @@ main :: IO ()
 main = do 
 	args <- getArgs
 	when (length args < 2) showUsage
-	let indexFile = args !! 0
+	let indexFile = head args
 	let term = args !! 1
 	search indexFile term
 

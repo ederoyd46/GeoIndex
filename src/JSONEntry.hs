@@ -13,7 +13,7 @@ data JSONEntry = JSONEntry {  term :: String
                             , source :: String
                             , rank :: Float
                             , type' :: String
-                            , tags :: (M.Map String String)
+                            , tags :: M.Map String String
                             } deriving (Show)
 
 instance FromJSON JSONEntry where
