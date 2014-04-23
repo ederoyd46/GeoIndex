@@ -28,7 +28,7 @@ example: geo-index geodata.json geodata.idx
 
 *geo-search*<br>
 usage: indexFile term<br>
-example: geo-search geodata.idx 'LEEDS'
+example: geo-search geodata.idx leeds
 
 *geo-server*<br>
 usage: indexFile<br>
