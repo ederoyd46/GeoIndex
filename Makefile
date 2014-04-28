@@ -3,6 +3,14 @@ CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
 
 default: build
 
+ghc-build: tags
+	-@rm -r BUILD
+	@mkdir -p BUILD
+	@cp -r src/* BUILD
+	cd BUILD && ghc --make Main-Index && mv Main-Index geo-index
+	cd BUILD && ghc --make Main-Search && mv Main-Search geo-search
+	cd BUILD && ghc --make Main-Server && mv Main-Server geo-server
+
 #Default
 build: tags 
 	cabal configure
@@ -28,16 +36,16 @@ tags:
 	@hasktags -c src/
 
 cleanMacFiles:
-	@find . -name '._*' -exec rm {} \;
-	@find . -name '.hdevtools.sock' -exec rm {} \;
+	-@find . -name '._*' -exec rm {} \;
+	-@find . -name '.hdevtools.sock' -exec rm {} \;
 
 cleanPlatform: clean cleanMacFiles
-	@rm cabal.sandbox.config
-	@rm -r platform
+	-@rm cabal.sandbox.config
+	-@rm -r platform
 
 clean:
-	@rm $(BASE_DIR)/tags
-	@rm -r $(BASE_DIR)/dist
+	-@rm $(BASE_DIR)/tags
+	-@rm -r $(BASE_DIR)/dist
 	
 kill:
 	killall Geo-Index
