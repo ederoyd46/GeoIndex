@@ -12,3 +12,4 @@ RELEASE
 *.sublime-workspace
 .hdevtools.sock
 BUILD
+bin

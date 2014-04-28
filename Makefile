@@ -4,12 +4,12 @@ CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
 default: build
 
 ghc-build: tags
-	-@rm -r BUILD
-	@mkdir -p BUILD
+	-@rm -r bin BUILD
+	@mkdir -p BUILD bin
 	@cp -r src/* BUILD
-	cd BUILD && ghc --make Main-Index && mv Main-Index geo-index
-	cd BUILD && ghc --make Main-Search && mv Main-Search geo-search
-	cd BUILD && ghc --make Main-Server && mv Main-Server geo-server
+	cd BUILD && ghc --make Main-Index && mv Main-Index ../bin/geo-index 
+	cd BUILD && ghc --make Main-Search && mv Main-Search ../bin/geo-search 
+	cd BUILD && ghc --make Main-Server && mv Main-Server ../bin/geo-server 
 
 #Default
 build: tags 
