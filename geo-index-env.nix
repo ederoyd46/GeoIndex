@@ -7,32 +7,13 @@ let
       self.utf8String
       self.binary
       self.aeson
+      self.hasktags
     ]
   ));
 in 
   pkgs.myEnvFun {
-    name = "geo-index";
+    name = "geo-index-env";
     buildInputs = with pkgs; [
       haskellEnv
     ];
   }
-
-
-#     extraCmds = $(grep export ${hsEnv.outPath}/bin/ghc);
-
-
- # ++
- # Include the deps of our project to make them available for tools:
- #(geoIndexPkgs.callPackage ./my-haskell-project.nix {}).propagatedNativeBuildInputs));
-
-#  let
-#    pkgs = import <nixpkgs> {};
-#    stdenv = pkgs.stdenv;
-#  in rec {
-#    clangEnv = stdenv.mkDerivation rec {
-#      name = "clang-env";
-#      version = "1.1.1.1";
-#      src = ./.;
-#      buildInputs = [ pkgs.clang ];
-#    };
-#  }
