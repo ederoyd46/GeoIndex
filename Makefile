@@ -1,17 +1,16 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
-PREFIX=
 
 default: build
 
 #Default
 .PHONY build: tags
-	-@rm -r bin BUILD
-	@mkdir -p BUILD bin
-	@cp -r src/* BUILD
-	cd BUILD && ghc --make Main-Index && mv Main-Index ../bin/geo-index 
-	cd BUILD && ghc --make Main-Search && mv Main-Search ../bin/geo-search 
-	cd BUILD && ghc --make Main-Server && mv Main-Server ../bin/geo-server 
+	-@rm -r $(BASE_DIR)/$(PREFIX)/bin $(BASE_DIR)/$(PREFIX)/BUILD
+	@mkdir -p $(BASE_DIR)/$(PREFIX)/BUILD $(BASE_DIR)/$(PREFIX)/bin
+	@cp -r src/* $(BASE_DIR)/$(PREFIX)/BUILD
+	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
+	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
+	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
 
 install: build
 
@@ -29,8 +28,8 @@ cleanPlatform: clean cleanMacFiles
 clean:
 	-@rm $(BASE_DIR)/tags
 	-@rm -r $(BASE_DIR)/dist
-	-@rm -r $(BASE_DIR)/BUILD
-	-@rm -r $(BASE_DIR)/bin
+	-@rm -r $(BASE_DIR)/$(PREFIX)/BUILD
+	-@rm -r $(BASE_DIR)/$(PREFIX)/bin
 	
 kill:
 	killall Geo-Index
