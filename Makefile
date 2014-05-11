@@ -1,5 +1,6 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
+PREFIX=
 
 default: build
 
@@ -11,6 +12,8 @@ default: build
 	cd BUILD && ghc --make Main-Index && mv Main-Index ../bin/geo-index 
 	cd BUILD && ghc --make Main-Search && mv Main-Search ../bin/geo-search 
 	cd BUILD && ghc --make Main-Server && mv Main-Server ../bin/geo-server 
+
+install: build
 
 tags:
 	@hasktags -c src/
@@ -40,7 +43,7 @@ clean-generated-protocol-buffers:
 	@rm -r $(BASE_DIR)/src/PB
 
 cabal2nix: 
-	cabal2nix --sha256=null GeoIndex.cabal > ~/.nixpkgs/haskell/geo-index.nix
+	cabal2nix --sha256=null GeoIndex.cabal > ~/.nixpkgs/haskell/geo-index-cabal2.nix
 
 # Wrap Cabal Commands ############################################
 cabal-build: tags 
