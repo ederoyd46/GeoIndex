@@ -1,18 +1,16 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
 
-default: build
+default: cabal-build
 
 #Default
-.PHONY build: tags
+ghc-build: tags
 	-@rm -r $(BASE_DIR)/$(PREFIX)/bin $(BASE_DIR)/$(PREFIX)/BUILD
 	@mkdir -p $(BASE_DIR)/$(PREFIX)/BUILD $(BASE_DIR)/$(PREFIX)/bin
 	@cp -r src/* $(BASE_DIR)/$(PREFIX)/BUILD
-	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
-	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
-	cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
-
-install: build
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
 
 tags:
 	@hasktags -c src/
@@ -36,13 +34,13 @@ kill:
 	killall Geo-Search
 
 generate-protocol-buffers:
-	cd $(BASE_DIR)/etc && hprotoc --include_imports --haskell_out=$(BASE_DIR)/src $(BASE_DIR)/etc/indexformat.proto
+	@cd $(BASE_DIR)/etc && hprotoc --include_imports --haskell_out=$(BASE_DIR)/src $(BASE_DIR)/etc/indexformat.proto
 
 clean-generated-protocol-buffers:
 	@rm -r $(BASE_DIR)/src/PB
 
 cabal2nix: 
-	cabal2nix --sha256=null GeoIndex.cabal > ~/.nixpkgs/haskell/geo-index-cabal2.nix
+	@cabal2nix --sha256=null GeoIndex.cabal > ~/.nixpkgs/haskell/geo-index-cabal2.nix
 
 # Wrap Cabal Commands ############################################
 cabal-build: tags 
