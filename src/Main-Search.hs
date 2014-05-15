@@ -19,6 +19,9 @@ main = do
   let term = args !! 1
   results <- search indexFile term
   mapM_ (printEntry) results
+  putStrLn $ ""
+  putStrLn $ show (length results) ++ " Results Found"
+
 
 printEntry entry = do
   let t = toList $ tags entry
@@ -32,7 +35,6 @@ printEntry entry = do
   putStrLn $ "# Type:        " ++ (uToString $ type' entry)
   mapM_ (printTag) t
   putStrLn $ "##################################################"
-  putStrLn $ ""
   where
     printTag tag = do
       let p = sParseTerm
