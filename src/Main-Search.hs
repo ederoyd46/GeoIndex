@@ -8,11 +8,12 @@ import Control.Monad(when)
 
 main :: IO ()
 main = do 
-	args <- getArgs
-	when (length args < 2) showUsage
-	let indexFile = head args
-	let term = args !! 1
-	search indexFile term
+  args <- getArgs
+  when (length args < 2) showUsage
+  let indexFile = head args
+  let term = args !! 1
+  results <- search indexFile term
+  mapM_ (print) results
 
 showUsage :: IO ()
 showUsage = do

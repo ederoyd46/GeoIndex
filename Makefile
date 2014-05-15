@@ -4,13 +4,23 @@ CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
 default: cabal-build
 
 #Default
-ghc-build: tags
+ghc-build-clean:
 	-@rm -r $(BASE_DIR)/$(PREFIX)/bin $(BASE_DIR)/$(PREFIX)/BUILD
+
+ghc-build-init: ghc-build-clean tags
 	@mkdir -p $(BASE_DIR)/$(PREFIX)/BUILD $(BASE_DIR)/$(PREFIX)/bin
 	@cp -r src/* $(BASE_DIR)/$(PREFIX)/BUILD
+
+ghc-build-index: ghc-build-init
 	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
+
+ghc-build-search: ghc-build-init
 	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
+	
+ghc-build-server: ghc-build-init
 	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
+
+ghc-build: ghc-build-index ghc-build-search ghc-build-server
 
 tags:
 	@hasktags -c src/

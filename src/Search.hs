@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy as ByteString (readFile, drop)
 import Data.Int
 import qualified Data.Map as M
 
-search :: String -> String -> IO ()
+search :: String -> String -> IO ([Entry.Entry])
 search f s = do
   handle <- ByteString.readFile f
   let (header, hoffset, soffset) = runGet getHeader handle
@@ -25,16 +25,14 @@ search f s = do
       let subIndexData = ByteString.drop (fromIntegral (hoffset + o)) handle
       let subIndex = runGet (getSubIndex s) subIndexData
       case M.lookup term subIndex of
-        Just el -> mapM_ (
+        Just el -> return $ map (
                     \(eo,es) -> do
                       let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
-                      let entry = runGet (getEntry es) entryData
-                      print entry
+                      runGet (getEntry es) entryData :: Entry.Entry
                    ) el
-        Nothing -> print "Sub Entry does not exist"
-    Nothing -> print "Does not exist"
+        Nothing -> return []
+    Nothing -> return []
 	
-
 getEntry :: Int64 -> Get Entry.Entry
 getEntry entrySize = do
     entryBytes <- getLazyByteString (fromIntegral entrySize)
