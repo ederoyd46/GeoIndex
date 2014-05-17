@@ -1,10 +1,4 @@
 option java_package = "PB.Index";
-//option java_outer_classname = "FileFormat";
-
-//message Header {
-//	repeated string term = 1;
-//	repeated sint64 size = 2;
-//}
 
 message Tag {
   required string key = 1;
@@ -15,8 +9,6 @@ message Entry {
 	required string term = 1;
 	required string latitude = 2;
 	required string longitude = 3;
-//	required sint64 latitude = 2;
-//	required sint64 longitude = 3;
 	required string src = 4;
   required string rank = 5;
   required string type = 6;

@@ -43,21 +43,3 @@ function findRank(element) {
   if("FARM" == element) return 30;
   return 10;
 }
-
-// function parseTerm(searchTerm) {
-//   var parsedTerm = searchTerm.replace(/ near /g,'');
-//   parsedTerm = parsedTerm.replace(/ in /g,'');
-//   parsedTerm = parsedTerm.replace(/_/g,'');
-//   parsedTerm = parsedTerm.replace(/[^\w]/g,'').toUpperCase()
-//   return parsedTerm;
-// }
-
-// function fixTags(tags) {
-//   for (var key in tags) { 
-//     if (key.indexOf(".") > -1) {
-//       delete tags[key];
-//     }
-//   }
-//   return tags;
-// }
-
