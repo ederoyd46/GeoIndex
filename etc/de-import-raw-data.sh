@@ -26,11 +26,12 @@ fi
 
 cd $ORIG
 
-if [ ! -d "$download/geo-data/openstreetmap" ]; then
-  mkdir -p $download/geo-data/openstreetmap
-  cd $download/geo-data/openstreetmap
-  curl -C - -O http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
+#if [ ! -d "$download/geo-data/openstreetmap" ]; then
+#  mkdir -p $download/geo-data/openstreetmap
+#  cd $download/geo-data/openstreetmap
+  #curl -C - -O http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
+#  curl -C - -O http://download.geofabrik.de/europe/germany-latest.osm.pbf
 #  OSMImport localhost geo_data_de $download/geo-data/openstreetmap/berlin-latest.osm.pbf +RTS -K32M -RTS
-fi
+#fi
 
 

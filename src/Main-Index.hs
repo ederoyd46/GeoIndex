@@ -7,7 +7,7 @@ import System.Exit (exitFailure)
 import System.Environment (getArgs)
 
 main :: IO ()
-main = do 
+main = do
   args <- getArgs
   when (length args < 1) showUsage
   let fileToIndex = head args
