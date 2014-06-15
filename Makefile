@@ -1,26 +1,28 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
+GHC_FLAGS=-O2 -rtsopts
 
-default: cabal-build
+# GHC Build #################################################################################
 
-#Default
-ghc-build-clean:
+default: build
+
+clean:
 	-@rm -r $(BASE_DIR)/$(PREFIX)/bin $(BASE_DIR)/$(PREFIX)/BUILD
 
-ghc-build-init: ghc-build-clean tags
+init: tags
 	@mkdir -p $(BASE_DIR)/$(PREFIX)/BUILD $(BASE_DIR)/$(PREFIX)/bin
 	@cp -r src/* $(BASE_DIR)/$(PREFIX)/BUILD
 
-ghc-build-index: ghc-build-init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
+build-index: init
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index $(GHC_FLAGS) && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
 
-ghc-build-search: ghc-build-init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
+build-search: init
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search $(GHC_FLAGS) && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
 	
-ghc-build-server: ghc-build-init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
+build-server: init
+	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server $(GHC_FLAGS) && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
 
-ghc-build: ghc-build-index ghc-build-search ghc-build-server
+build: build-index build-search build-server
 
 tags:
 	@hasktags -c src/
@@ -30,18 +32,15 @@ cleanMacFiles:
 	-@find . -name '.hdevtools.sock' -exec rm {} \;
 
 cleanPlatform: clean cleanMacFiles
-	-@rm cabal.sandbox.config
-	-@rm -r platform
-
-clean:
 	-@rm $(BASE_DIR)/tags
 	-@rm -r $(BASE_DIR)/dist
-	-@rm -r $(BASE_DIR)/$(PREFIX)/BUILD
-	-@rm -r $(BASE_DIR)/$(PREFIX)/bin
+	-@rm cabal.sandbox.config
+	-@rm -r platform
 	
 kill:
 	killall Geo-Index
 	killall Geo-Search
+	killall Geo-Server
 
 generate-protocol-buffers:
 	@cd $(BASE_DIR)/etc && hprotoc --include_imports --haskell_out=$(BASE_DIR)/src $(BASE_DIR)/etc/indexformat.proto

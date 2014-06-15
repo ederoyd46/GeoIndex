@@ -4,7 +4,7 @@ ORIG=$PWD
 download=$PWD/Download
 
 #Download data
-if [ ! -d "$download/geo-data/postcode" ]; then
+if [ ! -f "$download/geo-data/postcode/DE.zip" ]; then
   mkdir -p $download/geo-data/postcode
   cd $download/geo-data/postcode
   curl -C - -O http://download.geonames.org/export/zip/DE.zip
@@ -15,7 +15,7 @@ fi
 
 cd $ORIG
 
-if [ ! -d "$download/geo-data/placename" ]; then
+if [ ! -f "$download/geo-data/placename/DE.zip" ]; then
   mkdir -p $download/geo-data/placename
   cd $download/geo-data/placename
   curl -C - -O http://download.geonames.org/export/dump/DE.zip
@@ -26,10 +26,9 @@ fi
 
 cd $ORIG
 
-#if [ ! -d "$download/geo-data/openstreetmap" ]; then
+#if [ ! -f "$download/geo-data/openstreetmap" ]; then
 #  mkdir -p $download/geo-data/openstreetmap
 #  cd $download/geo-data/openstreetmap
-  #curl -C - -O http://download.geofabrik.de/europe/germany/berlin-latest.osm.pbf
 #  curl -C - -O http://download.geofabrik.de/europe/germany-latest.osm.pbf
 #  OSMImport localhost geo_data_de $download/geo-data/openstreetmap/berlin-latest.osm.pbf +RTS -K32M -RTS
 #fi

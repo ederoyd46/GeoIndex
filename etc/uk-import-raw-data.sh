@@ -4,7 +4,7 @@ ORIG=$PWD
 download=$PWD/Download
 
 #Download data
-if [ ! -d "$download/geo-data/postcode" ]; then
+if [ ! -f "$download/geo-data/postcode/GB_full.csv.zip" ]; then
   mkdir -p $download/geo-data/postcode
   cd $download/geo-data/postcode
   curl -C - -O http://download.geonames.org/export/zip/GB_full.csv.zip
@@ -15,7 +15,7 @@ fi
 
 cd $ORIG
 
-if [ ! -d "$download/geo-data/placename" ]; then
+if [ ! -f "$download/geo-data/placename/GB.zip" ]; then
   mkdir -p $download/geo-data/placename
   cd $download/geo-data/placename
   curl -C - -O http://download.geonames.org/export/dump/GB.zip
@@ -26,7 +26,7 @@ fi
 
 cd $ORIG
 
-if [ ! -d "$download/geo-data/openstreetmap" ]; then
+if [ ! -f "$download/geo-data/openstreetmap/england-latest.osm.pbf" ]; then
   mkdir -p $download/geo-data/openstreetmap
   cd $download/geo-data/openstreetmap
   curl -C - -O http://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
