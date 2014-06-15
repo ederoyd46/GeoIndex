@@ -1,6 +1,6 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
-GHC_FLAGS=-O2 -rtsopts
+GHC_FLAGS=-O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports
 
 # GHC Build #################################################################################
 
