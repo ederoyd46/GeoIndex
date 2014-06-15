@@ -7,20 +7,20 @@ GHC_FLAGS=-O2 -rtsopts
 default: build
 
 clean:
-	-@rm -r $(BASE_DIR)/$(PREFIX)/bin $(BASE_DIR)/$(PREFIX)/BUILD
+	-@rm -r $(BASE_DIR)/bin $(BASE_DIR)/BUILD
 
 init: tags
-	@mkdir -p $(BASE_DIR)/$(PREFIX)/BUILD $(BASE_DIR)/$(PREFIX)/bin
-	@cp -r src/* $(BASE_DIR)/$(PREFIX)/BUILD
+	@mkdir -p $(BASE_DIR)/BUILD $(BASE_DIR)/bin
+	@cp -r src/* $(BASE_DIR)/BUILD
 
 build-index: init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Index $(GHC_FLAGS) && mv Main-Index $(BASE_DIR)/$(PREFIX)/bin/geo-index 
+	@cd $(BASE_DIR)/BUILD && ghc --make Main-Index $(GHC_FLAGS) && mv Main-Index $(BASE_DIR)/bin/geo-index 
 
 build-search: init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Search $(GHC_FLAGS) && mv Main-Search $(BASE_DIR)/$(PREFIX)/bin/geo-search 
+	@cd $(BASE_DIR)/BUILD && ghc --make Main-Search $(GHC_FLAGS) && mv Main-Search $(BASE_DIR)/bin/geo-search 
 	
 build-server: init
-	@cd $(BASE_DIR)/$(PREFIX)/BUILD && ghc --make Main-Server $(GHC_FLAGS) && mv Main-Server $(BASE_DIR)/$(PREFIX)/bin/geo-server 
+	@cd $(BASE_DIR)/BUILD && ghc --make Main-Server $(GHC_FLAGS) && mv Main-Server $(BASE_DIR)/bin/geo-server 
 
 build: build-index build-search build-server
 
