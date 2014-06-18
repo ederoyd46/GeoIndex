@@ -2,6 +2,7 @@ let
   pkgs = import <nixpkgs> {};
   stdenv = pkgs.stdenv;
   fetchurl = pkgs.fetchurl;
+  fetchgit = pkgs.fetchgit;
   haskellEnv = pkgs.haskellPackages_ghc763_no_profiling.ghcWithPackages (self : (
     [
       self.protocolBuffers
@@ -13,15 +14,17 @@ let
     ]
   ));
   version = "1.0.0.0";
-  mainSrc = fetchurl {
-    url = "https://github.com/ederoyd46/GeoIndex/archive/${version}.tar.gz";
-    sha256 = null;
+  gitSrc = fetchgit {
+    url = "https://github.com/ederoyd46/GeoIndex";
+    rev = "355bec620397e2d8f614ca03ae3242f0c2dffe7c";
+    sha256 = "1swwskv1z0h4fwiql8w7cf1vjfqf5nkzg7i7cdz0w14cw2352km9";
   };
+
 in 
 
 stdenv.mkDerivation rec {
   name = "GeoIndex-${version}";
-  src = mainSrc;
+  src = gitSrc;
 
   buildPhase = ''
     export PATH=${haskellEnv.outPath}/bin:$PATH
