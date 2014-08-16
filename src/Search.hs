@@ -3,17 +3,17 @@
 module Search where
 
 import Common
-import qualified PB.Index.Entry as Entry
-import Text.ProtocolBuffers.Basic (ByteString)
-import Text.ProtocolBuffers.WireMessage (messageGet)
 import Data.Binary (decode)
 import Data.Binary.Get (Get, getWord64be, getLazyByteString, runGet, bytesRead)
 import qualified Data.ByteString.Lazy as ByteString (readFile, drop)
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Int
 import qualified Data.Map as M
+import Data.ProtocolBuffers (decodeMessage)
+import qualified Proto as P
+import Data.Serialize (runGetLazy)
 
-search :: String -> String -> IO ([Entry.Entry])
+search :: String -> String -> IO ([P.Entry])
 search f s = do
   handle <- ByteString.readFile f
   let (header, hoffset, soffset) = runGet getHeader handle
@@ -28,15 +28,15 @@ search f s = do
         Just el -> return $ map (
                     \(eo,es) -> do
                       let entryData = ByteString.drop (fromIntegral (eoffset + eo)) handle
-                      runGet (getEntry es) entryData :: Entry.Entry
+                      runGet (getEntry es) entryData :: P.Entry
                    ) el
         Nothing -> return []
     Nothing -> return []
 	
-getEntry :: Int64 -> Get Entry.Entry
+getEntry :: Int64 -> Get P.Entry
 getEntry entrySize = do
     entryBytes <- getLazyByteString (fromIntegral entrySize)
-    let Right (entry,_) = messageGet entryBytes ::  Either String (Entry.Entry, ByteString)
+    let Right entry = runGetLazy decodeMessage =<< Right entryBytes ::  Either String P.Entry
     return entry
  
 getSubIndex :: Int64 -> Get (M.Map String [(Int64, Int64)])

@@ -5,11 +5,9 @@ import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 import Control.Monad(when)
-import PB.Index.Entry
-import PB.Index.Tag
-import Common
-import Data.Foldable (toList)
-import Text.ProtocolBuffers.Basic (uToString)
+import Proto
+import Data.ProtocolBuffers (getField)
+import qualified Data.Text as T
 
 main :: IO ()
 main = do 
@@ -24,24 +22,22 @@ main = do
 
 
 printEntry entry = do
-  let t = toList $ tags entry
   putStrLn $ ""
   putStrLn $ "##################################################"
-  putStrLn $ "# Term:                   " ++ (uToString $ term entry)
-  putStrLn $ "# Latitude:               " ++ (uToString $ latitude entry)
-  putStrLn $ "# Longitude:              " ++ (uToString $ longitude entry)
-  putStrLn $ "# Source:                 " ++ (uToString $ src entry)
-  putStrLn $ "# Rank:                   " ++ (uToString $ rank entry)
-  putStrLn $ "# Type:                   " ++ (uToString $ type' entry)
-  mapM_ (printTag) t
-  putStrLn $ "# Open Streetmap:         " ++ ("http://www.openstreetmap.org/#map=15/" ++ (uToString $ latitude entry) ++ "/" ++ (uToString $ longitude entry))
-  putStrLn $ "# Here:                   " ++ ("http://here.com/" ++ (uToString $ latitude entry) ++ "," ++ (uToString $ longitude entry) ++ ",15,0,0,normal.day")
-  putStrLn $ "# Google Maps:            " ++ ("http://www.google.co.uk/maps/@" ++ (uToString $ latitude entry) ++ "," ++ (uToString $ longitude entry) ++ ",15z")
+  putStrLn $ "# Term:                   " ++ (T.unpack . getField $ term entry)
+  putStrLn $ "# Latitude:               " ++ (T.unpack . getField $ latitude entry)
+  putStrLn $ "# Longitude:              " ++ (T.unpack . getField $ longitude entry)
+  putStrLn $ "# Source:                 " ++ (T.unpack . getField $ src entry)
+  putStrLn $ "# Rank:                   " ++ (T.unpack . getField $ rank entry)
+  putStrLn $ "# Type:                   " ++ (T.unpack . getField $ type' entry)
+  mapM_ (printTag) $ getField $ tags entry
+  putStrLn $ "# Open Streetmap:         " ++ ("http://www.openstreetmap.org/#map=15/" ++ (T.unpack . getField $ latitude entry) ++ "/" ++ (T.unpack . getField $ longitude entry))
+  putStrLn $ "# Here:                   " ++ ("http://here.com/" ++ (T.unpack . getField $ latitude entry) ++ "," ++ (T.unpack . getField $ longitude entry) ++ ",15,0,0,normal.day")
+  putStrLn $ "# Google Maps:            " ++ ("http://www.google.co.uk/maps/@" ++ (T.unpack . getField $ latitude entry) ++ "," ++ (T.unpack . getField $ longitude entry) ++ ",15z")
   putStrLn $ "##################################################"
   where
     printTag tag = do
-      let p = sParseTerm
-      putStrLn $ "# Tag:                    " ++ (uToString $ key tag) ++ " = " ++ (uToString $ value tag) 
+      putStrLn $ "# Tag:                    " ++ (T.unpack . getField $ key tag) ++ " = " ++ (T.unpack . getField $ value tag)
 
 showUsage :: IO ()
 showUsage = do

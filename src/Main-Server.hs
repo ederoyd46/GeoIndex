@@ -5,7 +5,6 @@ import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 import Control.Monad(when, forever)
-import PB.Index.Entry
 
 main :: IO ()
 main = do 
