@@ -9,27 +9,6 @@ module Proto where
   import GHC.Generics (Generic)
   import Data.Serialize (runGet, runPut)
   
-  testOut :: ByteString
-  testOut = do
-    let putStrField s = putField (T.pack s)
-    let toBuffer a = runPut $ encodeMessage a
-    let tag = Tag { key = putStrField "KEY", value = putStrField "VALUE" }
-    let entry = Entry { term = putStrField "LEEDS"
-                      , latitude = putStrField "123456"
-                      , longitude = putStrField "654321"
-                      , src = putStrField "TEST"
-                      , rank = putStrField "1"
-                      , type' = putStrField "TEST"
-                      , tags = putField [tag]
-                      }
-    toBuffer entry
-  
-  testIn :: ByteString -> IO ()
-  testIn msg = do
-    let Right result = runGet decodeMessage =<< Right msg :: Either String Entry
-    putStrLn $ show result
-
-
   data Tag = Tag
     { key :: Required 1 (Value Text)
     , value :: Required 2 (Value Text)
