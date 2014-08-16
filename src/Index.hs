@@ -2,26 +2,22 @@
 
 module Index where
 
+import Prelude hiding (length, writeFile, concat)
 import Common
 import qualified Data.Set as Set (fromList, toList)
 import qualified Data.Map as M
-import qualified PB.Index.Entry as Entry
-import qualified PB.Index.Tag as Tag
-import Text.ProtocolBuffers.Basic (ByteString, uFromString, Utf8)
-import Text.ProtocolBuffers (getVal)
-import Data.Sequence(fromList)
-import Text.ProtocolBuffers.WireMessage (messagePut)
 import Data.Binary (encode)
-import qualified Data.ByteString.Lazy as ByteString (writeFile, length, concat)
+import qualified Proto as P
+import Data.ByteString.Lazy(ByteString, writeFile, length, concat)
 import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines)
 import qualified Data.Aeson as JSON
 import JSONEntry
 --import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Maybe(mapMaybe)
 import Data.Int
-
-getSearchTerm :: Entry.Entry -> Utf8
-getSearchTerm e = getVal e Entry.term
+import Data.ProtocolBuffers (putField, encodeMessage)
+import qualified Data.Text as T
+import Data.Serialize (runPutLazy)
 
 rootTermLimit :: Int
 rootTermLimit = 3
@@ -38,7 +34,7 @@ indexFile f i = do
   where
     writeIndexFile :: (Int64, ByteString, Int64, ByteString) -> ByteString -> IO ()
     writeIndexFile (rootSize,rootIndex,subIndexSize,subIndex) entries = 
-      ByteString.writeFile i $ ByteString.concat 
+      writeFile i $ concat 
             [ encode rootSize
             , rootIndex
             , encode subIndexSize
@@ -57,14 +53,14 @@ buildIndex indexData = do
   let subIndexTerms = M.keys subIndex'
   let subIndexEntries = map encode $ M.elems subIndex'
 
-  let sizes = map ByteString.length subIndexEntries
+  let sizes = map length subIndexEntries
   let subIndexSize = sum sizes :: Int64
   let offsets = scanl (+) 0 sizes :: [Int64]
   
   let rootIndex = zip subIndexTerms $ zip offsets sizes
   let rootIndexEntries = encode rootIndex
-  let rootIndexSize = ByteString.length rootIndexEntries :: Int64
-  (rootIndexSize,rootIndexEntries,subIndexSize,ByteString.concat subIndexEntries)
+  let rootIndexSize = length rootIndexEntries :: Int64
+  (rootIndexSize,rootIndexEntries,subIndexSize,concat subIndexEntries)
   where
     cleanup = unique . removeBlank
     unique = Set.toList . Set.fromList
@@ -76,25 +72,26 @@ buildEntries jsonEntries = do
   let keys = map (parseTerm' . term) jsonEntries
   let entries = map (
         \e -> do
-          let b = messagePut . buildEntry $ e
-          (ByteString.length b, b)
+          let b = runPutLazy $ encodeMessage $ buildEntry $ e
+          (length b, b)
         ) jsonEntries
   
   let entryData = map snd entries
   let entrySizes = map fst entries
   let offsets = scanl (+) 0 entrySizes :: [Int64]
   let indexData = zip keys $ zip offsets entrySizes
-  (indexData, ByteString.concat entryData)
+  (indexData, concat entryData)
   where
-    buildEntry :: JSONEntry -> Entry.Entry
+    buildEntry :: JSONEntry -> P.Entry
     buildEntry e = do
-      let convertTags = map (\i -> Tag.Tag (uFromString (fst i)) (uFromString (snd i))) $ M.toList $ tags e
-      Entry.Entry { Entry.term = uFromString $ term e
-                  , Entry.latitude = uFromString $ show $ latitude e
-                  , Entry.longitude = uFromString $ show $ longitude e 
-                  , Entry.src = uFromString $ source e
-                  , Entry.rank = uFromString $ show $ rank e
-                  , Entry.type' = uFromString $ type' e
-                  , Entry.tags = fromList convertTags
+      let putStrField s = putField (T.pack s)
+      let convertTags = map (\i -> P.Tag (putStrField (fst i)) (putStrField (snd i))) $ M.toList $ tags e
+      P.Entry { P.term = putStrField $ term e
+                  , P.latitude = putStrField $ show $ latitude e
+                  , P.longitude = putStrField $ show $ longitude e 
+                  , P.src = putStrField $ source e
+                  , P.rank = putStrField $ show $ rank e
+                  , P.type' = putStrField $ type' e
+                  , P.tags = putField convertTags
                   }
 

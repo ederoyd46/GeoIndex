@@ -5,7 +5,7 @@ module Common where
 import Data.Int
 import Data.Char
 
-import Text.ProtocolBuffers.Basic (uFromString, uToString, Utf8)
+{-import Text.ProtocolBuffers.Basic (uFromString, uToString, Utf8)-}
 
 deltaEncode :: [Int64] -> [Int64]
 deltaEncode a = head a : zipWith (-) (tail a) a
@@ -13,14 +13,14 @@ deltaEncode a = head a : zipWith (-) (tail a) a
 deltaDecode :: [Int64] -> [Int64]
 deltaDecode = scanl1 (+)
 
-uParseTerm :: Utf8 -> Utf8
-uParseTerm = uFromString . parseTerm' . uToString
+{-uParseTerm :: Utf8 -> Utf8-}
+{-uParseTerm = uFromString . parseTerm' . uToString-}
 
-parseTerm :: String -> Utf8
-parseTerm = uFromString . parseTerm'
+{-parseTerm :: String -> Utf8-}
+{-parseTerm = uFromString . parseTerm'-}
 
-sParseTerm :: Utf8 -> String
-sParseTerm = parseTerm' . uToString
+{-sParseTerm :: Utf8 -> String-}
+{-sParseTerm = parseTerm' . uToString-}
 
 parseTerm' :: String -> String
 parseTerm' = do
