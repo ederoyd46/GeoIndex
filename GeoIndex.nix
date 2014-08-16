@@ -5,18 +5,17 @@ let
   fetchgit = pkgs.fetchgit;
   haskellEnv = pkgs.haskellPackages_ghc763.ghcWithPackages (self : (
     [
-      self.protocolBuffers
-      self.protocolBuffersDescriptor
+      self.protobuf
       self.utf8String
       self.binary
       self.aeson
       self.hasktags
     ]
   ));
-  version = "1.0.0.0";
+  version = "1.1.0.0";
   gitSrc = fetchgit {
     url = "https://github.com/ederoyd46/GeoIndex";
-    rev = "355bec620397e2d8f614ca03ae3242f0c2dffe7c";
+    rev = "421e9ebf45688d32ff635b9a53c7e4f2fff5462f";
     sha256 = "1swwskv1z0h4fwiql8w7cf1vjfqf5nkzg7i7cdz0w14cw2352km9";
   };
 

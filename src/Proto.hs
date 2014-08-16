@@ -5,9 +5,7 @@
 module Proto where
   import Data.ProtocolBuffers
   import Data.Text as T
-  import Data.ByteString hiding (putStrLn)
   import GHC.Generics (Generic)
-  import Data.Serialize (runGet, runPut)
   
   data Tag = Tag
     { key :: Required 1 (Value Text)
