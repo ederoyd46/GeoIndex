@@ -42,14 +42,8 @@ kill:
 	killall Geo-Search
 	killall Geo-Server
 
-generate-protocol-buffers:
-	@cd $(BASE_DIR)/etc && hprotoc --include_imports --haskell_out=$(BASE_DIR)/src $(BASE_DIR)/etc/indexformat.proto
-
-clean-generated-protocol-buffers:
-	@rm -r $(BASE_DIR)/src/PB
-
 cabal2nix: 
-	@cabal2nix --sha256=null GeoIndex.cabal > ~/.nixpkgs/haskell/geo-index-cabal2.nix
+	@cabal2nix --sha256=null GeoIndex.cabal
 
 # Wrap Cabal Commands ############################################
 cabal-build: tags 
