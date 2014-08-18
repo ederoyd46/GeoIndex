@@ -3,7 +3,7 @@ let
   stdenv = pkgs.stdenv;
   fetchurl = pkgs.fetchurl;
   fetchgit = pkgs.fetchgit;
-  haskellEnv = pkgs.haskellPackages_ghc763.ghcWithPackages (self : (
+  haskellEnv = pkgs.haskellPackages_ghc783_profiling.ghcWithPackages (self : (
     [
       self.protobuf
       self.utf8String
@@ -12,11 +12,11 @@ let
       self.hasktags
     ]
   ));
-  version = "1.1.0.0";
+  version = "1.0.0.1";
   gitSrc = fetchgit {
     url = "https://github.com/ederoyd46/GeoIndex";
-    rev = "421e9ebf45688d32ff635b9a53c7e4f2fff5462f";
-    sha256 = "1swwskv1z0h4fwiql8w7cf1vjfqf5nkzg7i7cdz0w14cw2352km9";
+    rev = "97848552899d0fd0856a9ddb265038b61a8a9261";
+    sha256 = "1vnqh5jhlpdkd4083ccl2y9jz89m13ch43zyfb56p0k60p91rcrg";
   };
 
 in 
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
   ];
 
   installPhase = ''
-    ensureDir $out/bin
+    mkDir $out/bin
     cp -r ./bin $out
   '';
 
