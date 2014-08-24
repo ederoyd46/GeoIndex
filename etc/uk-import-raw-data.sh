@@ -30,7 +30,7 @@ if [ ! -f "$download/geo-data/openstreetmap/england-latest.osm.pbf" ]; then
   mkdir -p $download/geo-data/openstreetmap
   cd $download/geo-data/openstreetmap
   curl -C - -O http://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
-#  OSMImport localhost geo_data_uk $download/geo-data/openstreetmap/england-latest.osm.pbf +RTS -K32M -RTS
+  OSMImport localhost geo_data_uk $download/geo-data/openstreetmap/england-latest.osm.pbf +RTS -K32M -RTS
 fi
 
 
