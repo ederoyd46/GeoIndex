@@ -1,6 +1,7 @@
 BASE_DIR=$(shell pwd)
 CABAL_SANDBOX=$(BASE_DIR)/platform/geoindex
-GHC_FLAGS=-O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports
+GHC_FLAGS=-O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports 
+#UNUSED FLAGS -fllvm -pgmlc /usr/bin/clang
 
 # GHC Build #################################################################################
 
@@ -52,9 +53,6 @@ cabal-build: tags
 
 cabal-install: tags
 	cabal install
-
-cabal-prerequisites-init:
-	cabal install hprotoc
 
 cabal-sandbox-init:
 	cabal sandbox init --sandbox $(CABAL_SANDBOX)
