@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Search
-import System.Environment (getArgs)
-import System.Exit (exitFailure)
-import System.IO (hPutStrLn, stderr)
-import Control.Monad(when)
-import Proto
-import Data.ProtocolBuffers (getField)
-import qualified Data.Text as T
+import           Control.Monad        (when)
+import           Data.ProtocolBuffers (getField)
+import qualified Data.Text            as T
+import           Proto
+import           Search
+import           System.Environment   (getArgs)
+import           System.Exit          (exitFailure)
+import           System.IO            (hPutStrLn, stderr)
 
 main :: IO ()
-main = do 
+main = do
   args <- getArgs
   when (length args < 2) showUsage
   let indexFile = head args
