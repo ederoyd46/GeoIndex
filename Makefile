@@ -46,6 +46,10 @@ kill:
 cabal2nix: 
 	@cabal2nix --sha256=null GeoIndex.cabal
 
+run_in_docker:
+	@docker run -it -rm -v `pwd`:/project -w /project/src haskell:geo-index ghci Index.hs
+	# @docker run -it -rm  -v `pwd`:/project -w /project haskell:geo-index bash
+
 # Wrap Cabal Commands ############################################
 cabal-build: tags 
 	cabal configure
