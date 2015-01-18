@@ -5,11 +5,13 @@ ENV DEBIAN_FRONTEND noninteractive
 ##################################################################################
 ## Install Required Software
 ##################################################################################
-RUN apt-get update && \
-	apt-get upgrade -y && \
-	apt-get install -y git-core make
+# RUN apt-get update && \
+# 	apt-get upgrade -y && \
+# 	apt-get install -y git-core make
 
-RUN git clone https://github.com/ederoyd46/GeoIndex
+# RUN git clone https://github.com/ederoyd46/GeoIndex
+ADD . /GeoIndex
+
 
 RUN cabal update && \
  	cabal install cabal-install cabal
