@@ -2,11 +2,10 @@ FROM haskell:7.8
 MAINTAINER Matthew Brown <matt@ederoyd.co.uk>
 ENV DEBIAN_FRONTEND noninteractive
 
-ADD . /GeoIndex
-
 RUN cabal update && \
  	cabal install cabal-install cabal
 
+ADD . /GeoIndex
 WORKDIR /GeoIndex
 RUN cabal install
 

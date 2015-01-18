@@ -22,28 +22,45 @@ Usage
 
 There are three client applications to build and search the index;
 
-*geo-index*<br>
-usage: fileToIndex indexFile<br>
+*geo-index*
+
+```
+usage: fileToIndex indexFile
 example: geo-index geodata.json geodata.idx
+```
 
-*geo-search*<br>
-usage: indexFile term<br>
+*geo-search*
+
+```
+usage: indexFile term
 example: geo-search geodata.idx leeds
+```
 
-*geo-server*<br>
-usage: indexFile<br>
+*geo-server*
+
+```
+usage: indexFile
 example: geo-server geodata.idx
-
+```
 
 Docker Usage
 ------------
 
-Pull down the repository<br>
-docker pull ederoyd46/geoindex<br>
+Pull down the repository
 
-Run a place name search<br>
+```
+docker pull ederoyd46/geoindex
+```
+
+Run a place name search
+
+```
 docker run --rm=true ederoyd46/geoindex leeds
+```
 
-Run a post code search<br>
+Run a post code search
+
+```
 docker run --rm=true ederoyd46/geoindex "LS1 3AD"
+```
 
