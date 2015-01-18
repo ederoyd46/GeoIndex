@@ -33,3 +33,17 @@ example: geo-search geodata.idx leeds
 *geo-server*<br>
 usage: indexFile<br>
 example: geo-server geodata.idx
+
+
+Docker Usage
+------------
+
+Pull down the repository<br>
+docker pull ederoyd46/geoindex<br>
+
+Run a place name search<br>
+docker run --rm=true ederoyd46/geoindex leeds
+
+Run a post code search<br>
+docker run --rm=true ederoyd46/geoindex "LS1 3AD"
+
