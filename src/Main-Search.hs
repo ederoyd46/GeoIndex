@@ -44,4 +44,3 @@ showUsage = do
   hPutStrLn stderr "usage: indexFile term"
   hPutStrLn stderr "example: geo-search geodata.idx 'LEEDS'"
   exitFailure
-

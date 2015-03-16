@@ -1,0 +1,5 @@
+http://download.geonames.org/export/zip/GB_full.csv.zip
+http://download.geonames.org/export/dump/GB.zip
+http://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
+http://download.geofabrik.de/europe/great-britain-latest.osm.pbf
+http://download.geofabrik.de/europe/germany-latest.osm.pbf

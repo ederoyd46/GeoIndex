@@ -6,7 +6,7 @@ module Proto where
   import Data.ProtocolBuffers
   import Data.Text as T
   import GHC.Generics (Generic)
-  
+
   data Tag = Tag
     { key :: Required 1 (Value Text)
     , value :: Required 2 (Value Text)
@@ -27,4 +27,3 @@ module Proto where
 
   instance Encode Entry
   instance Decode Entry
-
