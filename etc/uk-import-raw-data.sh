@@ -32,5 +32,3 @@ cd $ORIG
 #  curl -C - -O http://download.geofabrik.de/europe/great-britain/england-latest.osm.pbf
 #  OSMImport localhost geo_data_uk $download/geo-data/openstreetmap/england-latest.osm.pbf +RTS -K32M -RTS
 #fi
-
-

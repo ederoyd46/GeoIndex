@@ -17,10 +17,10 @@ module Proto where
 
   data Entry = Entry
     { term :: Required 1 (Value Text)
-    , latitude :: Required 2 (Value Text)
-    , longitude :: Required 3 (Value Text)
+    , latitude :: Required 2 (Value Float)
+    , longitude :: Required 3 (Value Float)
     , src :: Required 4 (Value Text)
-    , rank :: Required 5 (Value Text)
+    , rank :: Required 5 (Value Float)
     , type' :: Required 6 (Value Text)
     , tags :: Repeated 7 (Message Tag)
     } deriving (Generic, Show)

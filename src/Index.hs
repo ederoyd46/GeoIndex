@@ -12,7 +12,6 @@ import Data.ByteString.Lazy(ByteString, writeFile, length, concat)
 import qualified Data.ByteString.Lazy.Char8 as Char8 (readFile, lines)
 import qualified Data.Aeson as JSON
 import JSONEntry
---import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Maybe(mapMaybe)
 import Data.Int
 import Data.ProtocolBuffers (putField, encodeMessage)
@@ -26,15 +25,14 @@ indexFile :: String -> String -> IO ()
 indexFile f i = do
   contents <- Char8.readFile f
   let lines = Char8.lines contents
-  {-let jsonEntries = map fromJust . filter isJust $ map (\i -> JSON.decode i :: Maybe JSONEntry) lines-}
   let jsonEntries = mapMaybe (\i -> JSON.decode i :: Maybe JSONEntry) lines
   let entries = buildEntries jsonEntries
   let indexData = buildIndex $ fst entries
   writeIndexFile indexData (snd entries)
   where
     writeIndexFile :: (Int64, ByteString, Int64, ByteString) -> ByteString -> IO ()
-    writeIndexFile (rootSize,rootIndex,subIndexSize,subIndex) entries = 
-      writeFile i $ concat 
+    writeIndexFile (rootSize,rootIndex,subIndexSize,subIndex) entries =
+      writeFile i $ concat
             [ encode rootSize
             , rootIndex
             , encode subIndexSize
@@ -45,7 +43,7 @@ buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, Int64, ByteStrin
 buildIndex indexData = do
   let terms = map fst indexData
   let rootTerms = cleanup $ map (take rootTermLimit) terms
-  let indexData' = map (\(k,v) -> (take rootTermLimit k,[(k, [v])])) indexData 
+  let indexData' = map (\(k,v) -> (take rootTermLimit k,[(k, [v])])) indexData
   --This gives us :: rootkey -> [(key, [(offset, size)])]
   let subIndex = M.fromListWith (++) indexData'
   let subIndex' = M.map (M.fromListWith (++)) subIndex
@@ -56,7 +54,7 @@ buildIndex indexData = do
   let sizes = map length subIndexEntries
   let subIndexSize = sum sizes :: Int64
   let offsets = scanl (+) 0 sizes :: [Int64]
-  
+
   let rootIndex = zip subIndexTerms $ zip offsets sizes
   let rootIndexEntries = encode rootIndex
   let rootIndexSize = length rootIndexEntries :: Int64
@@ -75,7 +73,7 @@ buildEntries jsonEntries = do
           let b = runPutLazy $ encodeMessage $ buildEntry $ e
           (length b, b)
         ) jsonEntries
-  
+
   let entryData = map snd entries
   let entrySizes = map fst entries
   let offsets = scanl (+) 0 entrySizes :: [Int64]
@@ -87,11 +85,10 @@ buildEntries jsonEntries = do
       let putStrField s = putField (T.pack s)
       let convertTags = map (\i -> P.Tag (putStrField (fst i)) (putStrField (snd i))) $ M.toList $ tags e
       P.Entry { P.term = putStrField $ term e
-                  , P.latitude = putStrField $ show $ latitude e
-                  , P.longitude = putStrField $ show $ longitude e 
+                  , P.latitude = putField $ latitude e
+                  , P.longitude = putField $ longitude e
                   , P.src = putStrField $ source e
-                  , P.rank = putStrField $ show $ rank e
+                  , P.rank = putField $ rank e
                   , P.type' = putStrField $ type' e
                   , P.tags = putField convertTags
                   }
-

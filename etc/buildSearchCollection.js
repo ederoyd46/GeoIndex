@@ -4,7 +4,7 @@ db.Location_Index.drop();
 print("Building PostalCode Terms");
 var postalCodes = db.PostalCode.find({"latitude":{$ne:""}, "longitude":{$ne:""}});
 postalCodes.forEach(function(r) {
-  var newRecord = { searchTerm: r.postalCode
+  var newRecord = { term: r.postalCode
                   , latitude: r.latitude
                   , longitude: r.longitude
                   , source: "GEONAMES-POSTCODE"
@@ -20,7 +20,7 @@ var nodePlace = db.node.find({"tags.place": {$exists: true}, "tags.name": {$exis
 nodePlace.forEach(function(entry) {
   if (entry.tags.place != "") {
     var rankType = entry.tags.place.trim().toUpperCase()
-    var record = {   searchTerm: entry.tags.name
+    var record = {   term: entry.tags.name
                    , latitude: entry.latitude
                    , longitude: entry.longitude
                    , source: "OPENSTREETMAP-NODE-PLACES"
@@ -30,7 +30,7 @@ nodePlace.forEach(function(entry) {
                  }
     db.Location_Index.save(record);
   }
-}); 
+});
 
 function findRank(element) {
   if("CITY" == element) return 100;

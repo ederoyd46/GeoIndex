@@ -68,6 +68,8 @@ Executable geo-server
     snap == 0.13.3.2,
     mtl
 
+  Default-Extensions:
+    DeriveDataTypeable
 
 
   ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports

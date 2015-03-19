@@ -22,18 +22,21 @@ main = do
 
 
 printEntry entry = do
+  let latStr = (show . getField $ latitude entry)
+  let lonStr = (show . getField $ longitude entry)
+  let rankStr = (show . getField $ rank entry)
   putStrLn $ ""
   putStrLn $ "##################################################"
   putStrLn $ "# Term:                   " ++ (T.unpack . getField $ term entry)
-  putStrLn $ "# Latitude:               " ++ (T.unpack . getField $ latitude entry)
-  putStrLn $ "# Longitude:              " ++ (T.unpack . getField $ longitude entry)
+  putStrLn $ "# Latitude:               " ++ latStr
+  putStrLn $ "# Longitude:              " ++ lonStr
   putStrLn $ "# Source:                 " ++ (T.unpack . getField $ src entry)
-  putStrLn $ "# Rank:                   " ++ (T.unpack . getField $ rank entry)
+  putStrLn $ "# Rank:                   " ++ rankStr
   putStrLn $ "# Type:                   " ++ (T.unpack . getField $ type' entry)
   mapM_ (printTag) $ getField $ tags entry
-  putStrLn $ "# Open Streetmap:         " ++ ("http://www.openstreetmap.org/#map=15/" ++ (T.unpack . getField $ latitude entry) ++ "/" ++ (T.unpack . getField $ longitude entry))
-  putStrLn $ "# Here:                   " ++ ("http://here.com/" ++ (T.unpack . getField $ latitude entry) ++ "," ++ (T.unpack . getField $ longitude entry) ++ ",15,0,0,normal.day")
-  putStrLn $ "# Google Maps:            " ++ ("http://www.google.co.uk/maps/@" ++ (T.unpack . getField $ latitude entry) ++ "," ++ (T.unpack . getField $ longitude entry) ++ ",15z")
+  putStrLn $ "# Open Streetmap:         " ++ ("http://www.openstreetmap.org/#map=15/" ++ latStr ++ "/" ++ lonStr)
+  putStrLn $ "# Here:                   " ++ ("http://here.com/" ++ latStr ++ "," ++ lonStr ++ ",15,0,0,normal.day")
+  putStrLn $ "# Google Maps:            " ++ ("http://www.google.co.uk/maps/@" ++ latStr ++ "," ++ lonStr ++ ",15z")
   putStrLn $ "##################################################"
   where
     printTag tag = do

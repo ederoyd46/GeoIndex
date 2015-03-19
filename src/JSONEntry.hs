@@ -7,6 +7,27 @@ import Control.Applicative
 import qualified Data.Map as M
 import Data.Aeson
 
+
+data SearchResult = SearchResult { searchTerm :: String
+                     , count :: Int
+                     , results :: [JSONEntry]
+                     }
+
+
+instance FromJSON SearchResult where
+    parseJSON (Object v) = SearchResult <$>
+                            v .: "searchTerm" <*>
+                            v .: "count" <*>
+                            v .: "results"
+    parseJSON _ = mzero
+
+
+instance ToJSON SearchResult where
+   toJSON (SearchResult searchTerm count results) = object [  "searchTerm" .= searchTerm
+                                                            , "count" .= count
+                                                            , "results" .= results
+                                                           ]
+
 data JSONEntry = JSONEntry {  term :: String
                             , latitude :: Float
                             , longitude :: Float
@@ -18,7 +39,7 @@ data JSONEntry = JSONEntry {  term :: String
 
 instance FromJSON JSONEntry where
      parseJSON (Object v) = JSONEntry <$>
-                            v .: "searchTerm" <*>
+                            v .: "term" <*>
                             v .: "latitude" <*>
                             v .: "longitude" <*>
                             v .: "source" <*>
@@ -28,4 +49,12 @@ instance FromJSON JSONEntry where
      parseJSON _ = mzero
 
 
-
+instance ToJSON JSONEntry where
+   toJSON (JSONEntry term latitude longitude source rank type' tags) = object [ "term" .= term
+                                                                              , "latitude" .= latitude
+                                                                              , "longitude" .= longitude
+                                                                              , "source" .= source
+                                                                              , "rank" .= rank
+                                                                              , "type" .= type'
+                                                                              , "tags" .= tags
+                                                                              ]
