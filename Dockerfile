@@ -7,6 +7,7 @@ RUN cabal update && \
 
 ADD . /GeoIndex
 WORKDIR /GeoIndex
+
 RUN cabal install
 
 ENV PATH $PATH:/root/.cabal/bin
@@ -14,7 +15,5 @@ ENV PATH $PATH:/root/.cabal/bin
 RUN mkdir -p /data && \
 	cp /GeoIndex/test-data/geodata_uk.idx.xz /data/ && \
 	xz --decompress /data/geodata_uk.idx.xz
-
-EXPOSE 8000
 
 ENTRYPOINT ["geo-search", "/data/geodata_uk.idx"]

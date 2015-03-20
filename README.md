@@ -64,3 +64,20 @@ Run a post code search
 docker run --rm=true ederoyd46/geoindex "LS1 3AD"
 ```
 
+Run in server mode
+
+```
+docker run --rm=true --publish=8000:8000 --entrypoint="geo-server" ederoyd46/geoindex /data/geodata_uk.idx -p 8000 --access-log=/var/log/access.log --error-log=/var/log/error.log
+```
+
+Run a query in a browser, return as JSON
+
+```
+http://your_host:8000/search/london
+```
+
+Run a query in a browser, return as TXT
+
+```
+http://your_host:8000/search/london/txt
+```
