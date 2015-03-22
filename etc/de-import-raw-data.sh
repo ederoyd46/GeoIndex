@@ -30,5 +30,5 @@ cd $ORIG
 #  mkdir -p $download/geo-data/openstreetmap
 #  cd $download/geo-data/openstreetmap
 #  curl -C - -O http://download.geofabrik.de/europe/germany-latest.osm.pbf
-#  OSMImport localhost geo_data_de $download/geo-data/openstreetmap/berlin-latest.osm.pbf +RTS -K32M -RTS
+#  OSMImport localhost geo_data_de $download/geo-data/openstreetmap/germany-latest.osm.pbf +RTS -K32M -RTS
 #fi
