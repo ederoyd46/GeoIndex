@@ -1,2 +1,2 @@
 #!/bin/bash
-mongo localhost/geo_data_de buildSearchCollection.js 
+mongo localhost/geo_data_de buildSearchCollectionDE.js 

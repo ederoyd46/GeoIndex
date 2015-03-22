@@ -27,7 +27,7 @@ Executable geo-index
     containers >= 0.5.5.1,
     protobuf >= 0.2.0.4
 
-  ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports
+  ghc-options: -O2 -rtsopts -with-rtsopts=-K128M -threaded -fwarn-unused-imports
   default-language: Haskell2010
 
 Executable geo-search
@@ -46,7 +46,7 @@ Executable geo-search
     protobuf >= 0.2.0.4
 
 
-  ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports
+  ghc-options: -O2 -rtsopts -with-rtsopts=-K64M -threaded -fwarn-unused-imports
   default-language: Haskell2010
 
 Executable geo-server
@@ -72,5 +72,5 @@ Executable geo-server
     DeriveDataTypeable
 
 
-  ghc-options: -O2 -rtsopts -with-rtsopts=-K67108864 -threaded -fwarn-unused-imports
+  ghc-options: -O2 -rtsopts -with-rtsopts=-K64M -threaded -fwarn-unused-imports
   default-language: Haskell2010

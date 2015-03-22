@@ -67,17 +67,41 @@ docker run --rm=true ederoyd46/geoindex "LS1 3AD"
 Run in server mode
 
 ```
-docker run --rm=true --publish=8000:8000 --entrypoint="geo-server" ederoyd46/geoindex /data/geodata_uk.idx -p 8000 --access-log=/var/log/access.log --error-log=/var/log/error.log
+docker run --rm=true --publish=8001:8001 --entrypoint="geo-server" ederoyd46/geoindex /data/geodata_uk.idx -p 8001 --access-log=/var/log/access.log --error-log=/var/log/error.log
 ```
 
-Run a query in a browser, return as JSON
+Alternative server mode using the DE index
 
 ```
-http://your_host:8000/search/london
+docker run --rm=true --publish=8002:8002 --entrypoint="geo-server" ederoyd46/geoindex /data/geodata_de.idx -p 8002 --access-log=/var/log/access.log --error-log=/var/log/error.log
 ```
 
-Run a query in a browser, return as TXT
+
+Run a query in a browser example, return as JSON
 
 ```
-http://your_host:8000/search/london/txt
+http://www.ederoyd.co.uk:8001/search/london
+```
+
+```
+http://www.ederoyd.co.uk:8001/search/ls13ad
+```
+
+```
+http://www.ederoyd.co.uk:8002/search/berlin
+```
+
+```
+http://www.ederoyd.co.uk:8002/search/40210
+```
+
+
+Run a query in a browser example, return as text
+
+```
+http://www.ederoyd.co.uk:8001/search/london/txt
+```
+
+```
+http://www.ederoyd.co.uk:8002/search/berlin/txt
 ```
