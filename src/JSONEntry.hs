@@ -3,7 +3,6 @@
 module JSONEntry where
 
 import Control.Monad(mzero)
-import Control.Applicative
 import qualified Data.Map as M
 import Data.Aeson
 

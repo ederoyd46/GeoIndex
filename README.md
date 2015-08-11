@@ -4,11 +4,6 @@ Description
 This application uses data imported by the https://github.com/ederoyd46/OSMImport project to build an index on the filesystem for fast access by client applications. It is also the goal of this project to create a library for other applications to link against.
 
 
-Current Status
---------------
-
-0.0.0.1 - Initial version, scripts to export data from mongo then build the index. Sample client applications for searching.
-
 Installation Instructions
 -------------------------
 
@@ -80,28 +75,28 @@ docker run --rm=true --publish=8002:8002 --entrypoint="geo-server" ederoyd46/geo
 Run a query in a browser example, return as JSON
 
 ```
-http://www.ederoyd.co.uk:8001/search/london
+http://www.ederoyd.co.uk/api/geouk/search/london
 ```
 
 ```
-http://www.ederoyd.co.uk:8001/search/ls13ad
+http://www.ederoyd.co.uk/api/geouk/search/ls13ad
 ```
 
 ```
-http://www.ederoyd.co.uk:8002/search/berlin
+http://www.ederoyd.co.uk/api/geode/search/berlin
 ```
 
 ```
-http://www.ederoyd.co.uk:8002/search/40210
+http://www.ederoyd.co.uk/api/geode/search/40210
 ```
 
 
 Run a query in a browser example, return as text
 
 ```
-http://www.ederoyd.co.uk:8001/search/london/txt
+http://www.ederoyd.co.uk/api/geouk/search/london/txt
 ```
 
 ```
-http://www.ederoyd.co.uk:8002/search/berlin/txt
+http://www.ederoyd.co.uk/api/geode/search/berlin/txt
 ```

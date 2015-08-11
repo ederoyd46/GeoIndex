@@ -24,10 +24,10 @@ deltaDecode = scanl1 (+)
 
 parseTerm' :: String -> String
 parseTerm' = do
-	let filterAlphas = map toUpper . filter (\x -> isAlphaNum x || isSpace x)
-	let removeSpaces = filter isAlphaNum
-	let filterWords = unwords . filter ("NEAR" /=) . filter ("IN" /=) . words
-	removeSpaces . filterWords . filterAlphas
+    let filterAlphas = map toUpper . filter (\x -> isAlphaNum x || isSpace x)
+    let removeSpaces = filter isAlphaNum
+    let filterWords = unwords . filter ("NEAR" /=) . filter ("IN" /=) . words
+    removeSpaces . filterWords . filterAlphas
 
 parseRootTerm :: String -> String
 parseRootTerm = take 3 . parseTerm'
