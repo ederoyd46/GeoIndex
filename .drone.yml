@@ -1,0 +1,11 @@
+image: haskell:7.10.1
+env:
+  - PATH=$PATH:/root/.cabal/bin
+script:
+  - cabal update
+  - cabal install cabal-install cabal
+  - cabal install
+notify:
+  email:
+    recipients:
+      - matt@ederoyd.co.uk
