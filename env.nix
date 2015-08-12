@@ -9,7 +9,7 @@ let
       self.hasktags
     ]
   ));
-in 
+in
   pkgs.myEnvFun {
     name = "geo-index-env";
     buildInputs = with pkgs; [
