@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module Index where
 
@@ -70,7 +71,7 @@ buildEntries jsonEntries = do
   let keys = map (parseTerm' . term) jsonEntries
   let entries = map (
         \e -> do
-          let b = runPutLazy $ encodeMessage $ buildEntry $ e
+          let b = runPutLazy $ encodeMessage $ buildEntry e
           (length b, b)
         ) jsonEntries
 

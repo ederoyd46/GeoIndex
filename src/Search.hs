@@ -32,13 +32,13 @@ search f s = do
                    ) el
         Nothing -> return []
     Nothing -> return []
-	
+
 getEntry :: Int64 -> Get P.Entry
 getEntry entrySize = do
     entryBytes <- getLazyByteString (fromIntegral entrySize)
     let Right entry = runGetLazy decodeMessage =<< Right entryBytes ::  Either String P.Entry
     return entry
- 
+
 getSubIndex :: Int64 -> Get (M.Map String [(Int64, Int64)])
 getSubIndex subIndexSize = do
     subIndexBytes <- getLazyByteString (fromIntegral subIndexSize)
@@ -53,4 +53,3 @@ getHeader = do
     slen <- getWord64be
     offset <- bytesRead
     return (header, offset, fromIntegral slen)
-
