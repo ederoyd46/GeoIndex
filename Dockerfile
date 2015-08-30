@@ -1,12 +1,14 @@
-FROM haskell:7.10.1
+FROM haskell:7.10.2
 MAINTAINER Matthew Brown <matt@ederoyd.co.uk>
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN cabal update && \
- 	cabal install cabal-install cabal
+RUN apt-get update && apt-get install -y xz-utils
 
 ADD . /GeoIndex
 WORKDIR /GeoIndex
+
+RUN cabal update && \
+ 	cabal install cabal-install cabal
 
 RUN cabal install
 
