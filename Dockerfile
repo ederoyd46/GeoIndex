@@ -1,18 +1,13 @@
-FROM haskell:7.10.2
+FROM fpco/stack-build
 MAINTAINER Matthew Brown <matt@ederoyd.co.uk>
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y xz-utils
-
 ADD . /GeoIndex
 WORKDIR /GeoIndex
+RUN stack setup
+RUN stack install
 
-RUN cabal update && \
- 	cabal install cabal-install cabal
-
-RUN cabal install
-
-ENV PATH $PATH:/root/.cabal/bin
+ENV PATH $PATH:/root/.local/bin
 
 RUN mkdir -p /data && \
 	cp /GeoIndex/test-data/geodata_*.idx.xz /data/ && \

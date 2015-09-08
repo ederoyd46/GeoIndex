@@ -49,8 +49,8 @@ cabal2nix:
 build_in_docker:
 	@docker build --tag="ederoyd46/geoindex" --rm=true .
 
-run_in_docker:
-	@docker run -it -rm -v `pwd`:/project -w /project/src haskell:geo-index ghci Index.hs
+#run_in_docker:
+#	@docker run -it --rm=true -v `pwd`:/project -w /project/src ederoyd46/geoindex stack ghci Index.hs
 
 # Wrap Cabal Commands ############################################
 cabal-build: tags
