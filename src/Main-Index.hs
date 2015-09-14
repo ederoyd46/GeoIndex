@@ -19,4 +19,3 @@ showUsage = do
       hPutStrLn stderr "usage: fileToIndex indexFile"
       hPutStrLn stderr "example: geo-index geodata.json geodata.idx"
       exitFailure
-
