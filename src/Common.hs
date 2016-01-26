@@ -5,6 +5,7 @@ module Common where
 import Data.Int
 import Data.Char
 
+
 {-import Text.ProtocolBuffers.Basic (uFromString, uToString, Utf8)-}
 
 deltaEncode :: [Int64] -> [Int64]
