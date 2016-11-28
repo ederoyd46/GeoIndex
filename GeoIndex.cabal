@@ -2,7 +2,7 @@ name:                GeoIndex
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.0.0.1
+version:             0.0.0.2
 synopsis:            Application uses free data from multiple sources to provide geo search
 license:             MIT
 license-file:        LICENSE
@@ -17,7 +17,7 @@ Executable geo-index
     main-is: Main-Index.hs
 
   Build-depends:
-    base >= 4.8.0.0,
+    base,
     utf8-string,
     binary,
     aeson,
@@ -25,7 +25,7 @@ Executable geo-index
     text,
     cereal,
     containers,
-    protobuf >= 0.2.1.0
+    protobuf
 
   ghc-options: -rtsopts -with-rtsopts=-K128M -threaded -fwarn-unused-imports
   default-language: Haskell2010
@@ -40,7 +40,7 @@ Executable geo-search
     main-is: Main-Search.hs
 
   Build-depends:
-    base >= 4.8.0.0,
+    base,
     utf8-string,
     binary,
     aeson,
@@ -48,7 +48,7 @@ Executable geo-search
     text,
     cereal,
     containers,
-    protobuf >= 0.2.1.0
+    protobuf
 
 
   ghc-options: -rtsopts -with-rtsopts=-K64M -threaded -fwarn-unused-imports
@@ -64,7 +64,7 @@ Executable geo-server
     main-is: Main-Server.hs
 
   Build-depends:
-    base >= 4.8.0.0,
+    base,
     utf8-string,
     binary,
     aeson,
@@ -74,9 +74,8 @@ Executable geo-server
     containers,
     snap-core,
     snap-server,
-    snap,
     mtl,
-    protobuf >= 0.2.1.0
+    protobuf
 
   Default-Extensions:
     DeriveDataTypeable
