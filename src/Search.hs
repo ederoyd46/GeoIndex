@@ -6,7 +6,6 @@ import Common
 import Data.Binary (decode)
 import Data.Binary.Get (Get, getWord64be, getLazyByteString, runGet, bytesRead)
 import qualified Data.ByteString.Lazy as ByteString (readFile, drop)
---import Codec.Compression.Zlib as Zlib (compress, decompress)
 import Data.Int
 import qualified Data.Map as M
 import Data.ProtocolBuffers (decodeMessage)
