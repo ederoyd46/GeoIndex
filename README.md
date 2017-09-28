@@ -75,28 +75,28 @@ docker run --rm=true --publish=8002:8002 --entrypoint="geo-server" ederoyd46/geo
 Run a query in a browser example, return as JSON
 
 ```
-http://www.ederoyd.co.uk/api/geouk/search/london
+http://localhost:8001/api/geouk/search/london
 ```
 
 ```
-http://www.ederoyd.co.uk/api/geouk/search/ls13ad
+http://localhost:8001/api/geouk/search/ls13ad
 ```
 
 ```
-http://www.ederoyd.co.uk/api/geode/search/berlin
+http://localhost:8001/api/geode/search/berlin
 ```
 
 ```
-http://www.ederoyd.co.uk/api/geode/search/40210
+http://localhost:8001/api/geode/search/40210
 ```
 
 
 Run a query in a browser example, return as text
 
 ```
-http://www.ederoyd.co.uk/api/geouk/search/london/txt
+http://localhost:8001/api/geouk/search/london/txt
 ```
 
 ```
-http://www.ederoyd.co.uk/api/geode/search/berlin/txt
+http://localhost:8001/api/geode/search/berlin/txt
 ```

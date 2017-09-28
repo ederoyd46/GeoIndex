@@ -5,7 +5,6 @@ module Index where
 
 import Prelude hiding (length, writeFile, concat)
 import Common
-import qualified Data.Set as Set (fromList, toList)
 import qualified Data.Map as M
 import Data.Binary (encode)
 import qualified Proto as P
@@ -42,8 +41,6 @@ indexFile f i = do
 
 buildIndex :: [(String, (Int64, Int64))] -> (Int64, ByteString, Int64, ByteString)
 buildIndex indexData = do
-  let terms = map fst indexData
-  let rootTerms = cleanup $ map (take rootTermLimit) terms
   let indexData' = map (\(k,v) -> (take rootTermLimit k,[(k, [v])])) indexData
   --This gives us :: rootkey -> [(key, [(offset, size)])]
   let subIndex = M.fromListWith (++) indexData'
@@ -60,11 +57,6 @@ buildIndex indexData = do
   let rootIndexEntries = encode rootIndex
   let rootIndexSize = length rootIndexEntries :: Int64
   (rootIndexSize,rootIndexEntries,subIndexSize,concat subIndexEntries)
-  where
-    cleanup = unique . removeBlank
-    unique = Set.toList . Set.fromList
-    removeBlank = filter (/="")
-
 
 buildEntries :: [JSONEntry] -> ([(String, (Int64, Int64))], ByteString)
 buildEntries jsonEntries = do

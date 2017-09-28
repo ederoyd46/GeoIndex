@@ -7,10 +7,10 @@ import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 import Control.Monad.State
-import           Data.ProtocolBuffers (getField)
-import qualified Data.Text            as T
-import           Proto
-import qualified Data.ByteString.Char8      as B
+import Data.ProtocolBuffers (getField)
+import qualified Data.Text as T
+import Proto
+import qualified Data.ByteString.Char8 as B
 
 import Snap.Core
 import Snap.Http.Server
@@ -87,6 +87,7 @@ runHTMLSearch = do
   mapM_ (printEntry) results
   writeText "</body></html>"
 
+printEntry :: Entry -> Snap ()
 printEntry entry = do
   let latStr = (show . getField $ latitude entry)
   let lonStr = (show . getField $ longitude entry)

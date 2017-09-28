@@ -17,10 +17,10 @@ main = do
   let term = args !! 1
   results <- search indexFile term
   mapM_ (printEntry) results
-  putStrLn $ ""
+  putStrLn ""
   putStrLn $ show (length results) ++ " Results Found"
 
-
+printEntry :: Entry -> IO ()
 printEntry entry = do
   let latStr = (show . getField $ latitude entry)
   let lonStr = (show . getField $ longitude entry)
